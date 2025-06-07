@@ -1,0 +1,22 @@
+Package: EPmvnCDF
+Type: Package
+Title: Expectation-Propagation Approximation of Multivariate Normal CDFs
+Version: 0.2.0
+Date: 2025-02-18
+Authors@R: c(
+    person("Francesco", "Denti", ,"francescodenti.personal@gmail.com", 
+    role = c("aut","cre"),
+    comment = c(ORCID = "0000-0003-2978-4702")),
+    person("Augusto", "Fasano", ,"augusto.fasano@carloalberto.org", 
+    role = c("aut", "cph"),
+    comment = c(ORCID = "0000-0002-9734-0583"))
+  )
+Maintainer: Francesco Denti <francescodenti.personal@gmail.com>
+Description: The package estimates via EP the marginal likelihood of a dual Bayesian probit model. The quantity is equivalent to a cumulative distribution function of a multivariate normal.
+License: MIT + file LICENSE
+Imports: 
+    Rcpp (>= 1.0.12),
+    Rfast
+LinkingTo: Rcpp, RcppArmadillo
+RoxygenNote: 7.3.2
+Encoding: UTF-8

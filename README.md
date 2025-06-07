@@ -1,1 +1,47 @@
-# DualProbitCDF
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# EPmvnCDF Repository
+
+<!-- 
+[![Last Commit](https://img.shields.io/github/last-commit/fradenti/EPmvnCDF)](https://github.com/fradenti/EPmvnCDF)
+ -->
+
+The repository **EPmvnCDF**, short for
+
+*Expectation propagation for the estimation of multivariate normal
+cumulative distribution functions*
+<!--**DUA**l probit marginal **L**ikelihood **E**stimation via **EP** **A**pproximation, -->
+
+contains the R package implementing the estimation strategy proposed in
+
+*‘’Multivariate Gaussian cumulative distribution functions as the
+marginal likelihood of their dual Bayesian probit model’’*  
+by A. Fasano and F. Denti
+
+and the code needed to reproduce the simulation studies and the figures.
+
+First, set the working directory to this directory - you can open the R
+project `EPmvnCDF.Rproj`. Then, install the R package `EPmvnCDF`. You
+can either use the built versions via
+
+``` r
+install.packages("EPmvnCDF_0.1.0.tar.gz", type = "source")
+```
+
+or open the `R` project contained in the `EPmvnCDF/` folder and build it
+from there.
+
+Then you can run the code.
+
+In particular,
+
+- Scripts starting with letter `A` contain useful functions;
+- Scripts starting with letter `B` contain the code to run the four
+  methods. Results will be stored in the corresponding subfolder into
+  the `RDS/` folder;
+- The script starting with letter `C` contains the code to extract the
+  results from the saved `.RDS` files. Data frames will be created
+  created inside `RDS/`;
+- Scripts starting with letter `D` contain the code to produce the plots
+  showed in the paper. They will be saved in the folder `OUTPUT/`.
