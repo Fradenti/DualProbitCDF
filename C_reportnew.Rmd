@@ -1,5 +1,5 @@
 ---
-title: "Una seconda proposta per i grafici"
+title: "Obtaining results"
 output: html_document
 date: "2025-05-23"
 ---
@@ -144,7 +144,7 @@ time1 <- ggplot(t1 %>% filter(dim<1024))+
                    y = timerelative, group = b),
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
-  ylab(TeX("Ratio between computational times in seconds"))+
+  ylab(TeX("Ratio between computational times"))+
   xlab(TeX("u"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
@@ -159,7 +159,7 @@ L <- ggplot(t1)+
                    y = timerelative, group = b),
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
-  ylab(TeX("Ratio of times in seconds"))+
+  ylab(TeX("Ratio between computational times"))+
   xlab(TeX("u"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
@@ -187,6 +187,43 @@ plot1 + ggview::canvas(h=6,w=15)
 ggsave("NewFigures/DENSE_512_MAIN.pdf", width = 15, h=6)
 ```
 
+
+## probability curves
+
+```{r}
+d1 <- results_epcB %>% 
+  mutate(log2prob2 = case_when(!is.finite(log2prob)~NA,
+                               TRUE ~ log2prob)) %>%
+  group_by(b, dim, algo) %>% mutate(ml2p = mean(log2prob2, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  mutate( dimf = paste("m =",dim))
+
+d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                                      "m = 512","m = 1024"))
+d11 <- d1
+broken = d11 %>% filter(is.na(log2prob2)) %>% group_by(algo, dimf) %>% reframe(maxb = max(b))
+
+ggplot()+
+  geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d11, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_wrap(~dimf, scale="free_y")+
+  geom_point(data = d11 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("u"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "bottom")+
+  ggview::canvas(h=9,w=15)
+ggsave("NewFigures/DENSE_LINES_1024.pdf", width = 15, h=9)
+```
+
+
+
 # Fungible
 
 Import the results
@@ -200,7 +237,7 @@ results$algo <- ifelse(results$algo == "RIDGEWAY", "Ridgeway", results$algo)
 - First, we make sure that all EP algorithm specifications provide very similar results
 
 ```{r}
-eca <- results %>% filter(algo == "EP_Chol_algo")
+eca <- results %>% filter(algo == "EP_Chol_algo") # it is algo A
 ecb <- results %>% filter(algo == "EP_Chol_algoB")
 eea <- results %>% filter(algo == "EP_Eigen_algoA")
 eeb <- results %>% filter(algo == "EP_Eigen_algoB")
@@ -320,7 +357,7 @@ time1 <- ggplot(t1 %>% filter(dim<1024))+
                    y = timerelative, group = b),
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
-  ylab(TeX("Ratio between computational times in seconds"))+
+  ylab(TeX("Ratio between computational times"))+
   xlab(TeX("u"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
@@ -336,7 +373,7 @@ L <- ggplot(t1)+
                    y = timerelative, group = b),
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
-  ylab(TeX("Ratio of times in seconds"))+
+  ylab(TeX("Ratio between computational times"))+
   xlab(TeX("u"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
@@ -365,6 +402,39 @@ plot1 + ggview::canvas(h=6,w=15)
 ggsave("NewFigures/FUNG_512_MAIN.pdf", width = 15, h=6)
 ```
 
+## probability curves
+
+```{r}
+d1 <- results_epcB %>% 
+  mutate(log2prob2 = case_when(!is.finite(log2prob)~NA,
+                               TRUE ~ log2prob)) %>%
+  group_by(b, dim, algo) %>% mutate(ml2p = mean(log2prob2, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  mutate( dimf = paste("m =",dim))
+
+d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                                      "m = 512","m = 1024"))
+d11 <- d1
+broken = d11 %>% filter(is.na(log2prob2)) %>% group_by(algo, dimf) %>% reframe(maxb = max(b))
+
+ggplot()+
+  geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d11, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_wrap(~dimf, scale="free_y")+
+  geom_point(data = d11 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("u"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "bottom")+
+  ggview::canvas(h=9,w=15)
+ggsave("NewFigures/FUNG_LINES_1024.pdf", width = 15, h=9)
+```
 
 
 
@@ -486,7 +556,8 @@ plotEP <- all_EP %>% as_tibble() %>%
   ggplot()+facet_wrap(~type)+
   geom_hline(yintercept = 1,col=2)+
   geom_boxplot(aes(x = Var3, y = value))+
-  xlab("") + ylab(TeX("Ratio of times in seconds"))+
+  xlab("") + 
+    ylab(TeX("Ratio between computational times"))+
     theme(text = element_text(size=15))#+coord_flip()
 plotEP
 plotEP+ggview::canvas(h=5,w=15)
@@ -498,8 +569,8 @@ ggsave("NewFigures/ratio_of_times_EP.pdf",h=5,w=15)
 
 ```{r}
 results_epcB <- results %>% filter(algo != "EP_Eigen_algoA" , 
-                               algo != "EP_Eigen_algoB" , 
-                               algo != "EP_Chol_algoA")
+                                   algo != "EP_Eigen_algoB" , 
+                                   algo != "EP_Chol_algoA")
 table(results_epcB$algo)
 results_epcB <- results_epcB %>% left_join(truth %>% rename(dim = Ns),by = c("b","dim","rho")) %>% mutate(log2true = (Truep) / log(2))
 table(results_epcB$algo)
@@ -638,6 +709,10 @@ t1 <- results_epcB %>% mutate(timeep = long_time[1:18400]) %>%
   filter(algo != "EP_Chol_algoB") %>% 
   mutate( dimf = paste("m =",dim))
 
+table(t1$algo)
+t1$algo <- factor(t1$algo,levels =  c("Botev", "TLRank", "Ridgeway"))
+
+
 t1$dimf <- factor(t1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
                           "m = 512","m = 1024"))
 
@@ -647,7 +722,7 @@ L <- ggplot(t1 %>% filter(dim<1024))+
                    y = timerelative, group = b),
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
-  ylab(TeX("Ratio of times in seconds"))+
+  ylab(TeX("Ratio between computational times"))+
   xlab(TeX("u"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
@@ -662,7 +737,7 @@ L <- ggplot(t1)+
                    y = timerelative, group = b),
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
-  ylab(TeX("Ratio of times in seconds"))+
+  ylab(TeX("Ratio between computational times"))+
   xlab(TeX("u"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
@@ -670,5 +745,45 @@ L <- ggplot(t1)+
 L
 ggsave("NewFigures/ConstALL_1024_time.pdf",width = 10, h=6)
 ggsave("NewFigures/ConstALL_1024_long_time.pdf",width = 15, h=6)
+```
+
+
+## probability curves
+
+```{r}
+d2 <- results_epcB %>% 
+  mutate(log2prob2 = case_when(!is.finite(log2prob)~NA,
+                               TRUE ~ log2prob)) %>%
+  group_by(b, rho,#######
+           dim, algo) %>% mutate(ml2p = mean(log2prob2, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  mutate( dimf = paste("m =",dim),
+          rhof = paste0("rho ==",rho),
+          )
+
+d2$dimf <- factor(d2$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                                      "m = 512","m = 1024"))
+d2$rhof <- factor(d2$rhof)#,levels =  c("$\\rho = 0","m = 64","m = 128","m = 256",
+                           #           "m = 512","m = 1024"))
+broken = d2 %>% filter(is.na(log2prob2)) %>% group_by(algo, rho, dimf) %>% reframe(maxb = max(b))
+
+ggplot()+
+  geom_line(data=d2, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d2, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_grid(rhof~dimf, scale="free_y", label = label_parsed)+
+  geom_point(data = d2 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("u"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "bottom")+
+  ggview::canvas(h=9,w=15)
+ggsave("NewFigures/RHO_LINES_1024.pdf", width = 15, h=9)
+
 ```
 
