@@ -1,0 +1,285 @@
+# Dense ----------------------------------------------------------------
+
+Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+cov_dense <- readRDS("RDS/00_all_covs_dense.RDS")
+cov256 <- cov_dense[[4]]
+n <- nrow(cov256)
+NSIM <- 10
+u    <- 0
+
+NSAMPLE <- c(500,1000,5000,10000, 25000)
+PROBS_GENZ <- TIMES_GENZ <- matrix(NA,NSIM,length(NSAMPLE))
+
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+    set.seed(123*k)
+    startTime1 <- Sys.time()
+    prob       <- log2(tlrmvnmvt::pmvn(lower = rep(-Inf,  n), 
+                                upper = rep(u,n), 
+                                sigma = cov256,
+                                algorithm = tlrmvnmvt::GenzBretz(N = NSAMPLE[g]/20) )[1])
+    time       <- difftime(Sys.time(), startTime1, units=("secs"))[[1]]
+    TIMES_GENZ[k,g] <- time
+    PROBS_GENZ[k,g]  <- prob
+    cat(paste(k,"--",g,"\n"))
+}
+}
+saveRDS(PROBS_GENZ, "RDS/Comparison_in_0/Dense_GENZ_log2P_256.RDS")
+saveRDS(TIMES_GENZ, "RDS/Comparison_in_0/Dense_GENZ_times_256.RDS")
+
+PROBS_BOTEV <- TIMES_BOTEV <- matrix(NA,NSIM,length(NSAMPLE))
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+        set.seed(123*k)
+        startTime1 <- Sys.time()
+        prob       <-   log2(
+                            TruncatedNormal::pmvnorm(mu = rep(0, n), 
+                                                     sigma = cov256, 
+                                                     ub = rep(u,n),
+                                                     B = NSAMPLE[g])
+                          )
+        time       <- difftime(Sys.time(), startTime1, units=("secs"))[[1]]
+        TIMES_BOTEV[k,g] <- time
+        PROBS_BOTEV[k,g]  <- prob
+        cat(paste(k,"--",g,"\n"))
+      }
+}
+saveRDS(PROBS_BOTEV, "RDS/Comparison_in_0/Dense_BOTEV_log2P_256.RDS")
+saveRDS(TIMES_BOTEV, "RDS/Comparison_in_0/Dense_BOTEV_times_256.RDS")
+
+
+PROBS_RIDGE <- TIMES_RIDGE <- matrix(NA,NSIM,length(NSAMPLE))
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+    set.seed(123*k)
+    startTime0 <- Sys.time()
+    orthant_p <- ridgway_smc_cpp(x = rep(u,n),
+                                 Sigma = cov256,
+                                 ESS_fraction = .5,
+                                 M = NSAMPLE[g], 
+                                 verbose = FALSE)
+    time <- difftime(Sys.time(), startTime0, units=("secs"))[[1]]
+    TIMES_RIDGE[k,g] <- time
+    PROBS_RIDGE[k,g]  <- (orthant_p$logCDF)/log(2)
+    cat(paste(k,"--",g,"\n"))
+  }
+}
+saveRDS(PROBS_RIDGE, "RDS/Comparison_in_0/Dense_RIDGE_log2P_256.RDS")
+saveRDS(TIMES_RIDGE, "RDS/Comparison_in_0/Dense_RIDGE_times_256.RDS")
+
+
+
+colnames(PROBS_BOTEV) = paste("N =",NSAMPLE)
+colnames(PROBS_GENZ) = paste("N =",NSAMPLE)
+colnames(PROBS_RIDGE) = paste("N =",NSAMPLE)
+
+boxplot(PROBS_BOTEV,ylim=c(-320,-300))
+boxplot(PROBS_GENZ,add=T)
+boxplot(PROBS_RIDGE,add=T,fill=2)
+set.seed(123)
+t1 = Sys.time()
+ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
+                               Sigma = cov256,
+                               log.p = TRUE,
+                               eps = 100, 
+                               tol = 1e-4,
+                               algorithm = "B",
+                               method = "chol")
+timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
+ep_prob/log(2)
+
+abline(h = (ep_prob)/log(2),col=2)
+saveRDS(log2(ep_prob), "RDS/Comparison_in_0/Dense_EPCHOL2_log2P_256.RDS")
+saveRDS(timeEP, "RDS/Comparison_in_0/Dense_EPCHOL2_times_256.RDS")
+
+
+
+
+
+
+
+
+# Fungible ----------------------------------------------------------------
+
+Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+cov_fung <- readRDS("RDS/00_all_covs_dense.RDS")
+cov256 <- cov_fung[[4]]
+n <- nrow(cov256)
+NSIM <- 10
+
+NSAMPLE <- c(500,1000,5000,10000, 25000)
+PROBS_GENZ <- TIMES_GENZ <- matrix(NA,NSIM,length(NSAMPLE))
+
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+    set.seed(123*k)
+    startTime1 <- Sys.time()
+    prob       <- log2(tlrmvnmvt::pmvn(lower = rep(-Inf,  n), 
+                                       upper = rep(u,n), 
+                                       sigma = cov256,
+                                       algorithm = tlrmvnmvt::GenzBretz(N = NSAMPLE[g]))[1])
+    time       <- difftime(Sys.time(), startTime1, units=("secs"))[[1]]
+    TIMES_GENZ[k,g] <- time
+    PROBS_GENZ[k,g]  <- prob
+    cat(paste(k,"--",g,"\n"))
+  }
+}
+saveRDS(PROBS_GENZ, "RDS/Comparison_in_0/fung_GENZ_log2P_256.RDS")
+saveRDS(TIMES_GENZ, "RDS/Comparison_in_0/fung_GENZ_times_256.RDS")
+
+PROBS_BOTEV <- TIMES_BOTEV <- matrix(NA,NSIM,length(NSAMPLE))
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+    set.seed(123*k)
+    startTime1 <- Sys.time()
+    prob       <-   log2(
+      TruncatedNormal::pmvnorm(mu = rep(0, n), 
+                               sigma = cov256, 
+                               ub = rep(u,n),
+                               B = NSAMPLE[g])
+    )
+    time       <- difftime(Sys.time(), startTime1, units=("secs"))[[1]]
+    TIMES_BOTEV[k,g] <- time
+    PROBS_BOTEV[k,g]  <- prob
+    cat(paste(k,"--",g,"\n"))
+  }
+}
+saveRDS(PROBS_BOTEV, "RDS/Comparison_in_0/fung_BOTEV_log2P_256.RDS")
+saveRDS(TIMES_BOTEV, "RDS/Comparison_in_0/fung_BOTEV_times_256.RDS")
+
+
+PROBS_RIDGE <- TIMES_RIDGE <- matrix(NA,NSIM,length(NSAMPLE))
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+    set.seed(123*k)
+    startTime0 <- Sys.time()
+    orthant_p <- ridgway_smc_cpp(x = rep(u,256),
+                                 Sigma = cov256,
+                                 ESS_fraction = .5,
+                                 M = NSAMPLE[g], 
+                                 verbose = FALSE)
+    time <- difftime(Sys.time(), startTime0, units=("secs"))[[1]]
+    TIMES_RIDGE[k,g] <- time
+    PROBS_RIDGE[k,g]  <- (orthant_p$logCDF)/log(2)
+    cat(paste(k,"--",g,"\n"))
+  }
+}
+saveRDS(PROBS_RIDGE, "RDS/Comparison_in_0/fung_RIDGE_log2P_256.RDS")
+saveRDS(TIMES_RIDGE, "RDS/Comparison_in_0/fung_RIDGE_times_256.RDS")
+saveRDS(log2(ep_prob), "RDS/Comparison_in_0/Dense_EPCHOL2_log2P_256.RDS")
+
+
+colnames(PROBS_BOTEV) = paste("N =",NSAMPLE)
+colnames(PROBS_GENZ) = paste("N =",NSAMPLE)
+colnames(PROBS_RIDGE) = paste("N =",NSAMPLE)
+
+boxplot(PROBS_BOTEV,ylim=c(-320,-300))
+boxplot(PROBS_GENZ,add=T)
+boxplot(PROBS_RIDGE,add=T,fill=2)
+set.seed(123)
+t1 = Sys.time()
+ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
+                               Sigma = cov256,
+                               log.p = FALSE,
+                               eps = 100, tol = 1e-4,
+                               algorithm = "B",
+                               method = "chol")
+timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
+abline(h = log2(ep_prob),col=2)
+saveRDS(log2(ep_prob), "RDS/Comparison_in_0/fung_EPCHOL2_log2P_256.RDS")
+saveRDS(timeEP, "RDS/Comparison_in_0/fung_EPCHOL2_times_256.RDS")
+
+
+
+
+# Cov50 ----------------------------------------------------------------
+
+Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+cov_rhos <- readRDS("RDS/00_all_covs_rhos.RDS")
+cov256   <- cov_rhos[[4]][,,3]
+n <- nrow(cov256)
+NSIM <- 10
+
+NSAMPLE <- c(500,1000,5000,10000, 25000)
+PROBS_GENZ <- TIMES_GENZ <- matrix(NA,NSIM,length(NSAMPLE))
+
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+    set.seed(123*k)
+    startTime1 <- Sys.time()
+    prob       <- log2(tlrmvnmvt::pmvn(lower = rep(-Inf,  n), 
+                                       upper = rep(u,n), 
+                                       sigma = cov256,
+                                       algorithm = tlrmvnmvt::TLRQMC(N = NSAMPLE[g],
+                                                                     m =round(sqrt(n)))))
+    time       <- difftime(Sys.time(), startTime1, units=("secs"))[[1]]
+    TIMES_GENZ[k,g] <- time
+    PROBS_GENZ[k,g]  <- prob
+    cat(paste(k,"--",g,"\n"))
+  }
+}
+saveRDS(PROBS_GENZ, "RDS/Comparison_in_0/rho05_TLRNK_log2P_256.RDS")
+saveRDS(TIMES_GENZ, "RDS/Comparison_in_0/rho05_TLRNK_times_256.RDS")
+
+PROBS_BOTEV <- TIMES_BOTEV <- matrix(NA,NSIM,length(NSAMPLE))
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+    set.seed(123*k)
+    startTime1 <- Sys.time()
+    prob       <-   log2(
+      TruncatedNormal::pmvnorm(mu = rep(0, n), 
+                               sigma = cov256, 
+                               ub = rep(u,n),
+                               B = NSAMPLE[g])
+    )
+    time       <- difftime(Sys.time(), startTime1, units=("secs"))[[1]]
+    TIMES_BOTEV[k,g] <- time
+    PROBS_BOTEV[k,g]  <- prob
+    cat(paste(k,"--",g,"\n"))
+  }
+}
+saveRDS(PROBS_BOTEV, "RDS/Comparison_in_0/rho05_BOTEV_log2P_256.RDS")
+saveRDS(TIMES_BOTEV, "RDS/Comparison_in_0/rho05_BOTEV_times_256.RDS")
+
+
+PROBS_RIDGE <- TIMES_RIDGE <- matrix(NA,NSIM,length(NSAMPLE))
+for(g in seq_along(NSAMPLE)){
+  for(k in 1:NSIM){
+    set.seed(123*k)
+    startTime0 <- Sys.time()
+    orthant_p <- ridgway_smc_cpp(x = rep(u,n),
+                                 Sigma = cov256,
+                                 ESS_fraction = .5,
+                                 M = NSAMPLE[g], 
+                                 verbose = FALSE)
+    time <- difftime(Sys.time(), startTime0, units=("secs"))[[1]]
+    TIMES_RIDGE[k,g] <- time
+    PROBS_RIDGE[k,g]  <- (orthant_p$logCDF)/log(2)
+    cat(paste(k,"--",g,"\n"))
+  }
+}
+saveRDS(PROBS_RIDGE, "RDS/Comparison_in_0/rho05_RIDGE_log2P_256.RDS")
+saveRDS(TIMES_RIDGE, "RDS/Comparison_in_0/rho05_RIDGE_times_256.RDS")
+
+
+
+
+colnames(PROBS_BOTEV) <- paste("N =",NSAMPLE)
+colnames(PROBS_GENZ) <- paste("N =",NSAMPLE)
+colnames(PROBS_RIDGE) <- paste("N =",NSAMPLE)
+
+boxplot(PROBS_BOTEV)
+boxplot(PROBS_GENZ,add=T)
+boxplot(PROBS_RIDGE,add=T,fill=2)
+set.seed(123)
+t1 = Sys.time()
+ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
+                               Sigma = cov256,
+                               log.p = FALSE,
+                               eps = 100, tol = 1e-4,
+                               algorithm = "B",
+                               method = "chol")
+timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
+abline(h = log2(ep_prob),col=2)
+saveRDS(log2(ep_prob), "RDS/Comparison_in_0/rho05_EPCHOL2_log2P_256.RDS")
+saveRDS(timeEP, "RDS/Comparison_in_0/rho05_EPCHOL2_times_256.RDS")
