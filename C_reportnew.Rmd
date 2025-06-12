@@ -200,6 +200,9 @@ d1 <- results_epcB %>%
 
 d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
                                       "m = 512","m = 1024"))
+d1 <- 
+d1 %>% mutate(algo = case_when(algo == "EP_Chol_algoB"~ "EP Chol. Alg. 2",
+                               TRUE ~ algo))
 d11 <- d1
 broken = d11 %>% filter(is.na(log2prob2)) %>% group_by(algo, dimf) %>% reframe(maxb = max(b))
 
@@ -220,6 +223,25 @@ ggplot()+
         legend.position = "bottom")+
   ggview::canvas(h=9,w=15)
 ggsave("NewFigures/DENSE_LINES_1024.pdf", width = 15, h=9)
+
+
+ggplot()+
+  geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d11, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_wrap(~dimf, scale="free_y")+
+  geom_point(data = d11 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("u"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "none")+
+  ggview::canvas(h=9,w=15)
+ggsave("NewFigures/DENSE_LINES_1024_noleg.pdf", width = 15, h=9)
 ```
 
 
@@ -414,6 +436,9 @@ d1 <- results_epcB %>%
 
 d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
                                       "m = 512","m = 1024"))
+d1 <- 
+d1 %>% mutate(algo = case_when(algo == "EP_Chol_algoB"~ "EP Chol. Alg. 2",
+                               TRUE ~ algo))
 d11 <- d1
 broken = d11 %>% filter(is.na(log2prob2)) %>% group_by(algo, dimf) %>% reframe(maxb = max(b))
 
@@ -434,6 +459,24 @@ ggplot()+
         legend.position = "bottom")+
   ggview::canvas(h=9,w=15)
 ggsave("NewFigures/FUNG_LINES_1024.pdf", width = 15, h=9)
+
+ggplot()+
+  geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d11, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_wrap(~dimf, scale="free_y")+
+  geom_point(data = d11 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("u"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "none")+
+  ggview::canvas(h=9,w=15)
+ggsave("NewFigures/FUNG_LINES_1024_noleg.pdf", width = 15, h=9)
 ```
 
 
@@ -767,12 +810,15 @@ d2 <- results_epcB %>%
   group_by(b, rho,#######
            dim, algo) %>% mutate(ml2p = mean(log2prob2, na.rm=TRUE)) %>% 
   ungroup() %>% 
-  mutate( dimf = paste("m =",dim),
+  mutate( dimf = paste("m ==",dim),
           rhof = paste0("rho ==",rho),
           )
+d2 <- 
+d2 %>% mutate(algo = case_when(algo == "EP_Chol_algoB"~ "EP Chol. Alg. 2",
+                               TRUE ~ algo))
 
-d2$dimf <- factor(d2$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
-                                      "m = 512","m = 1024"))
+d2$dimf <- factor(d2$dimf,levels =  c("m == 16","m == 64","m == 128","m == 256",
+                                      "m == 512","m == 1024"))
 d2$rhof <- factor(d2$rhof)#,levels =  c("$\\rho = 0","m = 64","m = 128","m = 256",
                            #           "m = 512","m = 1024"))
 broken = d2 %>% filter(is.na(log2prob2)) %>% group_by(algo, rho, dimf) %>% reframe(maxb = max(b))
@@ -795,5 +841,24 @@ ggplot()+
   ggview::canvas(h=9,w=15)
 ggsave("NewFigures/RHO_LINES_1024.pdf", width = 15, h=9)
 
+
+
+ggplot()+
+  geom_line(data=d2, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d2, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_grid(rhof~dimf, scale="free_y", label = label_parsed)+
+  geom_point(data = d2 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("u"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "none")+
+  ggview::canvas(h=9,w=15)
+ggsave("NewFigures/RHO_LINES_1024_noleg.pdf", width = 15, h=9)
 ```
 
