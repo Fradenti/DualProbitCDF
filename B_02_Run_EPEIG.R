@@ -56,7 +56,6 @@ for(i in 1:length(Ns)){
                            b_vec = rep(Bs[b],Ns[i]), 
                            eps = 100, tol = 1e-4, type = "fungible")
       )
-      cat(paste("--------------------------------------\n"))
     }
     cat(paste("\n",b,"/",length(Bs),"\n"))
   }
@@ -82,7 +81,6 @@ for(i in 1:length(Ns)){
                    EP_EIG(covM = COV, 
                            b_vec = rep(Bs[b],Ns[i]), 
                            eps = 100, tol = 1e-4, type = "dense")      )
-      cat(paste("--------------------------------------\n"))
     }
     cat(paste("\n",b,"/",length(Bs),"\n"))
   }
@@ -135,7 +133,6 @@ for(j in 1:length(RHOs)){
                                    eps = 100, tol = 1e-4, 
                                    type = "const")
         )
-        cat(paste("--------------------------------------\n"))
       }
       cat(paste("\n",b,"/",length(Bs),"\n"))
     }
@@ -159,7 +156,6 @@ for(i in 1:length(Ns)){
                                  b_vec = rep(Bs[b],Ns[i]), 
                                  eps = 100, tol = 1e-4, type = "fungible")
       )
-      cat(paste("--------------------------------------\n"))
     }
   }
   nam = paste0("RDS/EP_EIG/EP_EIG_dim_",
@@ -181,7 +177,6 @@ for(i in 1:length(Ns)){
                    EP_EIG_algo1(covM = COV, 
                                  b_vec = rep(Bs[b],Ns[i]), 
                                  eps = 100, tol = 1e-4, type = "dense")      )
-      cat(paste("--------------------------------------\n"))
     }
   }
   nam = paste0("RDS/EP_EIG/EP_EIG_dim_",

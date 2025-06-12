@@ -506,7 +506,7 @@ plotEP+ggview::canvas(h=5,w=15)
 ggsave(filename = "NewFigures/logratio_prob_EP.pdf",h=5,w=15)
 ```
 
-same for time
+Same for time
 
 ```{r}
 q1 = TIM_dense %>% as_tibble() %>% mutate(type = "Dense Cov.")
@@ -551,6 +551,16 @@ table(Meltime$variable)
 all_EP <- Meltime %>% mutate(Var3 = case_when(variable == "CACB" ~ "Chol. Alg. 1/\nChol. Alg. 2",
                                               variable ==  "EACB" ~ "Eig. Alg. 1/\nChol. Alg. 2",
                                               variable ==  "EBCB" ~ "Eig. Alg. 2/\nChol. Alg. 2"))
+plotEP <- all_EP %>% as_tibble() %>% 
+  ggplot()+facet_wrap(~type)+
+  geom_hline(yintercept = 1,col=2)+
+  geom_boxplot(aes(x = Var3, y = value))+
+  xlab("") + scale_y_log10()+
+    ylab(TeX("Ratio between computational times"))+
+    theme(text = element_text(size=15))#+coord_flip()
+plotEP
+plotEP+ggview::canvas(h=5,w=15)
+ggsave("NewFigures/ratio_of_times_EP_log10.pdf",h=5,w=15)
 
 plotEP <- all_EP %>% as_tibble() %>% 
   ggplot()+facet_wrap(~type)+

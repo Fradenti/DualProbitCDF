@@ -38,7 +38,9 @@ for(j in 1:length(RHOs)){
     cat("---> Finished with dimension",Ns[i]," and correlation",RHOs[j],"\n")  
   }
 }
+sink()
 
+sink("RDS/EP_CHOL/progress_EPChol.txt")
 # Fungible CASE -------------------------------------------------
 fungiCOVs <- readRDS("RDS/00_all_covs_fungi.RDS")
 for(i in 1:length(Ns)){
@@ -63,8 +65,10 @@ for(i in 1:length(Ns)){
   saveRDS(PAR, nam)
     cat("---> Finished with dimension",Ns[i],"\n")  
 }
+sink()
 
 
+sink("RDS/EP_CHOL/progress_EPChol.txt")
 # Dense CASE -------------------------------------------------
 denseCOVs <- readRDS("RDS/00_all_covs_dense.RDS")
 for(i in 1:length(Ns)){
@@ -109,10 +113,10 @@ RHOs <- c(0, .25, .5, .75)
 NSIM <- 10
 Bs   <- seq(-2,2,length.out=20)
 
-
+sink("RDS/EP_CHOL/progress_EPChol.txt")
 fixedCOVs <- readRDS("RDS/00_all_covs_rhos.RDS")
 # CONSTANT CASE -------------------------------------------------
-for(j in 1:length(RHOs)){
+for(j in 3:length(RHOs)){
   for(i in 1:length(Ns)){
     PAR <- c()
     COV <- fixedCOVs[[i]][,,j]
@@ -175,7 +179,6 @@ for(i in 1:length(Ns)){
                    EP_CHOL_algo1(covM = COV, 
                            b_vec = rep(Bs[b],Ns[i]), 
                            eps = 100, tol = 1e-4, type = "dense")      )
-      cat(paste("--------------------------------------\n"))
     }
   }
   nam = paste0("RDS/EP_CHOL/EP_CHOL_dim_",
