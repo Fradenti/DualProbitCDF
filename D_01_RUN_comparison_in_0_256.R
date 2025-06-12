@@ -7,7 +7,7 @@ n <- nrow(cov256)
 NSIM <- 10
 u    <- 0
 
-NSAMPLE <- c(500,1000,5000,10000, 25000)
+NSAMPLE <- c(5000,10000,20000,50000)
 PROBS_GENZ <- TIMES_GENZ <- matrix(NA,NSIM,length(NSAMPLE))
 
 for(g in seq_along(NSAMPLE)){
@@ -86,10 +86,10 @@ ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
                                algorithm = "B",
                                method = "chol")
 timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
-ep_prob/log(2)
+timeEP
+ep_prob
 
-abline(h = (ep_prob)/log(2),col=2)
-saveRDS(log2(ep_prob), "RDS/Comparison_in_0/Dense_EPCHOL2_log2P_256.RDS")
+saveRDS((ep_prob)/log(2), "RDS/Comparison_in_0/Dense_EPCHOL2_log2P_256.RDS")
 saveRDS(timeEP, "RDS/Comparison_in_0/Dense_EPCHOL2_times_256.RDS")
 
 
@@ -107,7 +107,7 @@ cov256 <- cov_fung[[4]]
 n <- nrow(cov256)
 NSIM <- 10
 
-NSAMPLE <- c(500,1000,5000,10000, 25000)
+NSAMPLE <- c(5000,10000,20000,50000)
 PROBS_GENZ <- TIMES_GENZ <- matrix(NA,NSIM,length(NSAMPLE))
 
 for(g in seq_along(NSAMPLE)){
@@ -117,7 +117,7 @@ for(g in seq_along(NSAMPLE)){
     prob       <- log2(tlrmvnmvt::pmvn(lower = rep(-Inf,  n), 
                                        upper = rep(u,n), 
                                        sigma = cov256,
-                                       algorithm = tlrmvnmvt::GenzBretz(N = NSAMPLE[g]))[1])
+                                       algorithm = tlrmvnmvt::GenzBretz(N = NSAMPLE[g]/20))[1])
     time       <- difftime(Sys.time(), startTime1, units=("secs"))[[1]]
     TIMES_GENZ[k,g] <- time
     PROBS_GENZ[k,g]  <- prob
@@ -185,6 +185,7 @@ ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
                                algorithm = "B",
                                method = "chol")
 timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
+timeEP
 abline(h = log2(ep_prob),col=2)
 saveRDS(log2(ep_prob), "RDS/Comparison_in_0/fung_EPCHOL2_log2P_256.RDS")
 saveRDS(timeEP, "RDS/Comparison_in_0/fung_EPCHOL2_times_256.RDS")
@@ -200,7 +201,7 @@ cov256   <- cov_rhos[[4]][,,3]
 n <- nrow(cov256)
 NSIM <- 10
 
-NSAMPLE <- c(500,1000,5000,10000, 25000)
+NSAMPLE <- c(5000,10000,20000,50000)
 PROBS_GENZ <- TIMES_GENZ <- matrix(NA,NSIM,length(NSAMPLE))
 
 for(g in seq_along(NSAMPLE)){
@@ -210,7 +211,7 @@ for(g in seq_along(NSAMPLE)){
     prob       <- log2(tlrmvnmvt::pmvn(lower = rep(-Inf,  n), 
                                        upper = rep(u,n), 
                                        sigma = cov256,
-                                       algorithm = tlrmvnmvt::TLRQMC(N = NSAMPLE[g],
+                                       algorithm = tlrmvnmvt::TLRQMC(N = NSAMPLE[g]/20,
                                                                      m =round(sqrt(n)))))
     time       <- difftime(Sys.time(), startTime1, units=("secs"))[[1]]
     TIMES_GENZ[k,g] <- time
@@ -280,6 +281,7 @@ ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
                                algorithm = "B",
                                method = "chol")
 timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
+timeEP
 abline(h = log2(ep_prob),col=2)
 saveRDS(log2(ep_prob), "RDS/Comparison_in_0/rho05_EPCHOL2_log2P_256.RDS")
 saveRDS(timeEP, "RDS/Comparison_in_0/rho05_EPCHOL2_times_256.RDS")
