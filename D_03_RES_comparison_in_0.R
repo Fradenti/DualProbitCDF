@@ -79,8 +79,7 @@ ggplot()+
   facet_wrap(~cov, scale="free_y", label = label_parsed)+
   theme_bw()+
   xlab("N")+ylab(TeX("Estimated $log_2$ probabilities"))+
-  theme(legend.position = "none", text = element_text(size=18))+
-  ggview::canvas(h=5,w=15)
+  theme(legend.position = "none", text = element_text(size=18))
 ggsave("NewFigures/log2p_comparisonin0_m256.pdf",h=6,w=18)
 
 
@@ -162,7 +161,6 @@ ggplot()+
   facet_wrap(~cov, scale="free_y", label = label_parsed)+
   theme_bw()+scale_y_log10()+
   xlab("N")+ylab(TeX("Computational time in seconds ($log_{10} scale$)"))+
-  theme(legend.position = "none", text = element_text(size=18))+
-  ggview::canvas(h=6,w=18)
+  theme(legend.position = "none", text = element_text(size=18))
 
 ggsave("NewFigures/times_comparisonin0_m256.pdf",h=6,w=18)
