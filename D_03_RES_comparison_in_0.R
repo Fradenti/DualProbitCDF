@@ -131,7 +131,7 @@ A <- rbind(A_rho,A_fung, A_dense)
 colnames(A)
 
 ggplot()+
-  geom_boxplot(data=A,aes(x=Var2,y=value,col=algo))+
+  geom_boxplot(data=A,aes(x=factor(Var2),y=value,col=algo))+
   facet_wrap(~cov, scale="free_y")+scale_y_log10()+
   theme_bw()+
   geom_hline(data=EP, aes(yintercept = ep))

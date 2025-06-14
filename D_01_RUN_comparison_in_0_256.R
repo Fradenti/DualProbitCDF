@@ -67,42 +67,10 @@ for(g in seq_along(NSAMPLE)){
 saveRDS(PROBS_RIDGE, "RDS/Comparison_in_0/Dense_RIDGE_log2P_256.RDS")
 saveRDS(TIMES_RIDGE, "RDS/Comparison_in_0/Dense_RIDGE_times_256.RDS")
 
-
-
-colnames(PROBS_BOTEV) = paste("N =",NSAMPLE)
-colnames(PROBS_GENZ) = paste("N =",NSAMPLE)
-colnames(PROBS_RIDGE) = paste("N =",NSAMPLE)
-
-boxplot(PROBS_BOTEV,ylim=c(-320,-300))
-boxplot(PROBS_GENZ,add=T)
-boxplot(PROBS_RIDGE,add=T,fill=2)
-set.seed(123)
-t1 = Sys.time()
-ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
-                               Sigma = cov256,
-                               log.p = TRUE,
-                               eps = 100, 
-                               tol = 1e-4,
-                               algorithm = "B",
-                               method = "chol")
-timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
-timeEP
-ep_prob
-
-saveRDS((ep_prob)/log(2), "RDS/Comparison_in_0/Dense_EPCHOL2_log2P_256.RDS")
-saveRDS(timeEP, "RDS/Comparison_in_0/Dense_EPCHOL2_times_256.RDS")
-
-
-
-
-
-
-
-
 # Fungible ----------------------------------------------------------------
 
 Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
-cov_fung <- readRDS("RDS/00_all_covs_dense.RDS")
+cov_fung <- readRDS("RDS/00_all_covs_fungi.RDS")
 cov256 <- cov_fung[[4]]
 n <- nrow(cov256)
 NSIM <- 10
@@ -167,30 +135,6 @@ for(g in seq_along(NSAMPLE)){
 saveRDS(PROBS_RIDGE, "RDS/Comparison_in_0/fung_RIDGE_log2P_256.RDS")
 saveRDS(TIMES_RIDGE, "RDS/Comparison_in_0/fung_RIDGE_times_256.RDS")
 saveRDS(log2(ep_prob), "RDS/Comparison_in_0/Dense_EPCHOL2_log2P_256.RDS")
-
-
-colnames(PROBS_BOTEV) = paste("N =",NSAMPLE)
-colnames(PROBS_GENZ) = paste("N =",NSAMPLE)
-colnames(PROBS_RIDGE) = paste("N =",NSAMPLE)
-
-boxplot(PROBS_BOTEV,ylim=c(-320,-300))
-boxplot(PROBS_GENZ,add=T)
-boxplot(PROBS_RIDGE,add=T,fill=2)
-set.seed(123)
-t1 = Sys.time()
-ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
-                               Sigma = cov256,
-                               log.p = FALSE,
-                               eps = 100, tol = 1e-4,
-                               algorithm = "B",
-                               method = "chol")
-timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
-timeEP
-abline(h = log2(ep_prob),col=2)
-saveRDS(log2(ep_prob), "RDS/Comparison_in_0/fung_EPCHOL2_log2P_256.RDS")
-saveRDS(timeEP, "RDS/Comparison_in_0/fung_EPCHOL2_times_256.RDS")
-
-
 
 
 # Cov50 ----------------------------------------------------------------
@@ -264,24 +208,3 @@ saveRDS(TIMES_RIDGE, "RDS/Comparison_in_0/rho05_RIDGE_times_256.RDS")
 
 
 
-
-colnames(PROBS_BOTEV) <- paste("N =",NSAMPLE)
-colnames(PROBS_GENZ) <- paste("N =",NSAMPLE)
-colnames(PROBS_RIDGE) <- paste("N =",NSAMPLE)
-
-boxplot(PROBS_BOTEV)
-boxplot(PROBS_GENZ,add=T)
-boxplot(PROBS_RIDGE,add=T,fill=2)
-set.seed(123)
-t1 = Sys.time()
-ep_prob  <- EPmvnCDF::FASt_cdf(x = rep(u,n),
-                               Sigma = cov256,
-                               log.p = FALSE,
-                               eps = 100, tol = 1e-4,
-                               algorithm = "B",
-                               method = "chol")
-timeEP <- difftime(Sys.time(), t1, units=("secs"))[[1]]
-timeEP
-abline(h = log2(ep_prob),col=2)
-saveRDS(log2(ep_prob), "RDS/Comparison_in_0/rho05_EPCHOL2_log2P_256.RDS")
-saveRDS(timeEP, "RDS/Comparison_in_0/rho05_EPCHOL2_times_256.RDS")
