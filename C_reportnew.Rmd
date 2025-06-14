@@ -105,7 +105,6 @@ plot1 = ggplot()+
 
 
 plot1
-plot1 + ggview::canvas(h=6,w=12)
 ggsave("NewFigures/DENSE_1024.pdf",width = 12, h=6)
 ggsave("NewFigures/DENSE_1024_long.pdf",width = 15, h=6)
 
@@ -125,7 +124,6 @@ plot1 = ggplot()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 plot1
-plot1 + ggview::canvas(h=6,w=10)
 ggsave("NewFigures/DENSE_512.pdf",width = 10, h=6)
 ggsave("NewFigures/DENSE_512_long.pdf",width = 15, h=6)
 
@@ -150,7 +148,6 @@ time1 <- ggplot(t1 %>% filter(dim<1024))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 time1
-time1 + ggview::canvas(h=6,w=10)
 ggsave("NewFigures/DENSE_512_time.pdf",width = 10, h=6)
 ggsave("NewFigures/DENSE_512_long_time.pdf",width = 15, h=6)
 L <- ggplot(t1)+
@@ -183,7 +180,6 @@ plot1 = ggplot()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 plot1
-plot1 + ggview::canvas(h=6,w=15)
 ggsave("NewFigures/DENSE_512_MAIN.pdf", width = 15, h=6)
 ```
 
@@ -220,9 +216,8 @@ ggplot()+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1),
-        legend.position = "bottom")+
-  ggview::canvas(h=9,w=15)
-ggsave("NewFigures/DENSE_LINES_1024.pdf", width = 15, h=9)
+        legend.position = "bottom")
+ggsave("NewFigures/DENSE_LINES_1024.pdf", width = 15, h=6)
 
 
 ggplot()+
@@ -239,9 +234,8 @@ ggplot()+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1),
-        legend.position = "none")+
-  ggview::canvas(h=9,w=15)
-ggsave("NewFigures/DENSE_LINES_1024_noleg.pdf", width = 15, h=9)
+        legend.position = "none")
+ggsave("NewFigures/DENSE_LINES_1024_noleg.pdf", width = 15, h=6)
 ```
 
 
@@ -340,7 +334,6 @@ plot1 = ggplot()+
 
 
 plot1
-plot1 + ggview::canvas(h=6,w=12)
 ggsave("NewFigures/FUNG_1024.pdf",width = 12, h=6)
 ggsave("NewFigures/FUNG_1024_long.pdf",width = 15, h=6)
 
@@ -360,7 +353,6 @@ plot1 = ggplot()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 plot1
-plot1 + ggview::canvas(h=6,w=10)
 ggsave("NewFigures/FUNG_512.pdf",width = 10, h=6)
 ggsave("NewFigures/FUNG_512_long.pdf",width = 15, h=6)
 
@@ -385,7 +377,6 @@ time1 <- ggplot(t1 %>% filter(dim<1024))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 time1
-time1 + ggview::canvas(h=6,w=10)
 ggsave("NewFigures/FUNG_512_time.pdf",width = 10, h=6)
 ggsave("NewFigures/FUNG_512_long_time.pdf",width = 15, h=6)
 
@@ -420,7 +411,6 @@ plot1 = ggplot()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 plot1
-plot1 + ggview::canvas(h=6,w=15)
 ggsave("NewFigures/FUNG_512_MAIN.pdf", width = 15, h=6)
 ```
 
@@ -456,9 +446,8 @@ ggplot()+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1),
-        legend.position = "bottom")+
-  ggview::canvas(h=9,w=15)
-ggsave("NewFigures/FUNG_LINES_1024.pdf", width = 15, h=9)
+        legend.position = "bottom")
+ggsave("NewFigures/FUNG_LINES_1024.pdf", width = 15, h=6)
 
 ggplot()+
   geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
@@ -474,9 +463,8 @@ ggplot()+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1),
-        legend.position = "none")+
-  ggview::canvas(h=9,w=15)
-ggsave("NewFigures/FUNG_LINES_1024_noleg.pdf", width = 15, h=9)
+        legend.position = "none")
+ggsave("NewFigures/FUNG_LINES_1024_noleg.pdf", width = 15, h=6)
 ```
 
 
@@ -545,7 +533,6 @@ plotEP <- all_EP %>% as_tibble() %>%
   xlab("") + ylab(TeX("Relative difference in $log_2$ probabilities"))+
     theme(text = element_text(size=15))#+coord_flip()
 plotEP
-plotEP+ggview::canvas(h=5,w=15)
 ggsave(filename = "NewFigures/logratio_prob_EP.pdf",h=5,w=15)
 ```
 
@@ -570,7 +557,6 @@ plotEP <- all_EP %>% as_tibble() %>%
   xlab("") + ylab(TeX("Seconds"))+
     theme(text = element_text(size=15))#+coord_flip()
 plotEP
-plotEP+ggview::canvas(h=5,w=15)
 ggsave("NewFigures/times_EP.pdf",h=5,w=15)
 ```
 
@@ -602,7 +588,6 @@ plotEP <- all_EP %>% as_tibble() %>%
     ylab(TeX("Ratio between computational times"))+
     theme(text = element_text(size=15))#+coord_flip()
 plotEP
-plotEP+ggview::canvas(h=5,w=15)
 ggsave("NewFigures/ratio_of_times_EP_log10.pdf",h=5,w=15)
 
 plotEP <- all_EP %>% as_tibble() %>% 
@@ -613,7 +598,6 @@ plotEP <- all_EP %>% as_tibble() %>%
     ylab(TeX("Ratio between computational times"))+
     theme(text = element_text(size=15))#+coord_flip()
 plotEP
-plotEP+ggview::canvas(h=5,w=15)
 ggsave("NewFigures/ratio_of_times_EP.pdf",h=5,w=15)
 ```
 
@@ -719,7 +703,7 @@ ggsave("NewFigures/Const00_1024_long.pdf",width = 15, h=6)
 l00[[2]]
 ggsave("NewFigures/Const00_512.pdf",width = 10, h=6)
 ggsave("NewFigures/Const00_512_long.pdf",width = 15, h=6)
-l00[[3]]+ggview::canvas(h = 9, w=15)
+l00[[3]]
 ggsave("NewFigures/Const00_512_MAIN.pdf",h = 9, w=15)
 
 l25 = plots(d1,.25)
@@ -729,7 +713,7 @@ ggsave("NewFigures/Const25_long_1024.pdf",width = 15, h=6)
 l25[[2]]
 ggsave("NewFigures/Const25_512.pdf",width = 10, h=6)
 ggsave("NewFigures/Const25_512_long.pdf",width = 15, h=6)
-l25[[3]]+ggview::canvas(h = 9, w=15)
+l25[[3]]
 ggsave("NewFigures/Const25_512_MAIN.pdf",h = 9, w=15)
 
 l50 = plots(d1,.50)
@@ -739,7 +723,7 @@ ggsave("NewFigures/Const50_1024_long.pdf",width = 15, h=6)
 l50[[2]]
 ggsave("NewFigures/Const50_512.pdf",width = 10, h=6)
 ggsave("NewFigures/Const50_512_long.pdf",width = 15, h=6)
-l50[[3]]+ggview::canvas(h = 9, w=15)
+l50[[3]]
 ggsave("NewFigures/Const50_512_MAIN.pdf",h = 9, w=15)
 
 
@@ -751,7 +735,7 @@ ggsave("NewFigures/Const75_1024_long.pdf",width = 15, h=6)
 l75[[2]]
 ggsave("NewFigures/Const75_512.pdf",width = 10, h=6)
 ggsave("NewFigures/Const75_512_long.pdf",width = 15, h=6)
-l75[[3]]+ggview::canvas(h = 9, w=15)
+l75[[3]]
 ggsave("NewFigures/Const75_512_MAIN.pdf",width = 9, h=15)
 ```
 
@@ -821,6 +805,13 @@ d2$dimf <- factor(d2$dimf,levels =  c("m == 16","m == 64","m == 128","m == 256",
                                       "m == 512","m == 1024"))
 d2$rhof <- factor(d2$rhof)#,levels =  c("$\\rho = 0","m = 64","m = 128","m = 256",
                            #           "m = 512","m = 1024"))
+
+table(d2$algo)
+d2$algo <- factor(d2$algo, levels = c("Botev", 
+                                      "EP Chol. Alg. 2",   
+                                      "TLRank" ,     "Ridgeway"))
+
+
 broken = d2 %>% filter(is.na(log2prob2)) %>% group_by(algo, rho, dimf) %>% reframe(maxb = max(b))
 
 ggplot()+
@@ -837,8 +828,7 @@ ggplot()+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1),
-        legend.position = "bottom")+
-  ggview::canvas(h=9,w=15)
+        legend.position = "bottom")
 ggsave("NewFigures/RHO_LINES_1024.pdf", width = 15, h=9)
 
 
@@ -857,8 +847,7 @@ ggplot()+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1),
-        legend.position = "none")+
-  ggview::canvas(h=9,w=15)
+        legend.position = "none")
 ggsave("NewFigures/RHO_LINES_1024_noleg.pdf", width = 15, h=9)
 ```
 
