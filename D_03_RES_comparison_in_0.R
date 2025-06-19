@@ -64,7 +64,7 @@ colnames(A)
 ggplot()+
   geom_hline(data=EP, aes(yintercept = ep), col= 2, lwd=1.5, lty=1)+
   geom_boxplot(data=A,aes(x=factor(Var2),y=value,col=algo))+
-  scale_color_manual(values = c(1,4,3))+
+  scale_color_manual(values = c(1,3,4))+
   facet_wrap(~cov, scale="free_y", label = label_parsed)+
   theme_bw()+
   xlab("N")+ylab(TeX("Estimated $log_2$ probabilities"))+
@@ -75,7 +75,7 @@ ggplot()+
 ggplot()+
   geom_hline(data=EP, aes(yintercept = ep), col= 2, lwd=1.5, lty=1)+
   geom_boxplot(data=A,aes(x=factor(Var2),y=value,col=algo))+
-  scale_color_manual(values = c(1,4,3))+
+  scale_color_manual(values = c(1,3,4))+
   facet_wrap(~cov, scale="free_y", label = label_parsed)+
   theme_bw()+
   xlab("N")+ylab(TeX("Estimated $log_2$ probabilities"))+
@@ -146,7 +146,7 @@ colnames(A)
 ggplot()+
   geom_hline(data=EP, aes(yintercept = ep), col= 2, lwd=1.5, lty=1)+
   geom_boxplot(data=A,aes(x=factor(Var2),y=value,col=algo))+
-  scale_color_manual(values = c(1,4,3))+
+  scale_color_manual(values = c(1,3,4))+
   facet_wrap(~cov, scale="free_y", label = label_parsed)+
   theme_bw()+scale_y_log10()+
   xlab("N")+ylab(TeX("Estimated $log_2$ probabilities"))+
@@ -157,7 +157,7 @@ ggplot()+
 ggplot()+
   geom_hline(data=EP, aes(yintercept = ep), col= 2, lwd=1.5, lty=1)+
   geom_boxplot(data=A,aes(x=factor(Var2),y=value,col=algo))+
-  scale_color_manual(values = c(1,4,3))+
+  scale_color_manual(values = c(1,3,4))+
   facet_wrap(~cov, scale="free_y", label = label_parsed)+
   theme_bw()+scale_y_log10()+
   xlab("N")+ylab(TeX("Computational time in seconds ($log_{10} scale$)"))+
