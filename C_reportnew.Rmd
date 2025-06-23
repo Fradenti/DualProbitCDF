@@ -811,16 +811,16 @@ d2$algo <- factor(d2$algo, levels = c("Botev",
                                       "EP Chol. Alg. 2",   
                                       "TLRank" ,     "Ridgeway"))
 
-
-broken = d2 %>% filter(is.na(log2prob2)) %>% group_by(algo, rho, dimf) %>% reframe(maxb = max(b))
+broken <- d2 %>% filter(is.na(log2prob2)) %>% group_by(algo, rhof, dimf) %>% 
+  reframe(maxb = max(b)) 
 
 ggplot()+
-  geom_line(data=d2, aes(x=b,y=ml2p, col=algo))+
+  geom_line(data=d2, aes(x=b,y=ml2p, col=algo)) +
   geom_point(data = d2, aes(x = b,
-                             y = log2prob2, group = b, col=algo), alpha=.2)+
-  facet_grid(rhof~dimf, scale="free_y", label = label_parsed)+
+                             y = log2prob2, group = b, col=algo), alpha=.2) +
+  facet_grid(rhof~dimf, scale="free_y", label = label_parsed) +
   geom_point(data = d2 %>% filter(is.na(log2prob2)),
-            aes(x=b,y=0, col=algo), pch="|")+
+            aes(x=b,y=0, col=algo), pch="|") +
   geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
   ylab(TeX("Estimated $log_2$ probabilities"))+
   xlab(TeX("u"))+
@@ -833,14 +833,15 @@ ggsave("NewFigures/RHO_LINES_1024.pdf", width = 15, h=9)
 
 
 
-ggplot()+
+ggplot(d2)+
   geom_line(data=d2, aes(x=b,y=ml2p, col=algo))+
+  facet_grid( rhof ~ dimf, scale="free_y", label = label_parsed)+
   geom_point(data = d2, aes(x = b,
                              y = log2prob2, group = b, col=algo), alpha=.2)+
-  facet_grid(rhof~dimf, scale="free_y", label = label_parsed)+
   geom_point(data = d2 %>% filter(is.na(log2prob2)),
             aes(x=b,y=0, col=algo), pch="|")+
-  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  geom_vline(data=broken,aes(xintercept = maxb,
+                             col=algo, lty = algo))+
   ylab(TeX("Estimated $log_2$ probabilities"))+
   xlab(TeX("u"))+
   scale_color_manual("Algorithm", values = c(1,2,3,4))+
