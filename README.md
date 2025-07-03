@@ -3,39 +3,64 @@
 
 # DualProbitCDF Repository
 
-<!-- 
-[![Last Commit](https://img.shields.io/github/last-commit/fradenti/EPmvnCDF)](https://github.com/fradenti/EPmvnCDF)
- -->
+<!--**DUA**l probit marginal **L**ikelihood **E**stimation via **EP** **A**pproximation, -->
 
-The repository **DualProbitCDF** contains the R package implementing the estimation strategy proposed in
+[![Last
+Commit](https://img.shields.io/github/last-commit/fradenti/EPmvnCDF)](https://github.com/fradenti/EPmvnCDF)
 
-*‘’Multivariate Gaussian cumulative distribution functions as the
-marginal likelihood of their dual Bayesian probit model’’*  
-by A. Fasano and F. Denti, published in **Biometrika (2025)**
+The repository **DualProbitCDF** contains the R package and code
+implementing the estimation strategy proposed in the article:
 
-and the code needed to reproduce the simulation studies and the figures.
+> *“Multivariate Gaussian cumulative distribution functions as the
+> marginal likelihood of their dual Bayesian probit model”* by A. Fasano
+> and F. Denti, published in **Biometrika (2025)**.
 
-First, set the working directory to this directory - you can open the R
-project `DualProbitCDF.Rproj`. Then, install the R package `EPmvnCDF`. You
-can either use the built versions via
+In addition to the package itself, the repository includes all the
+scripts needed to reproduce the simulation studies and the figures
+presented in the paper.
 
-``` r
-install.packages("EPmvnCDF_0.1.0.tar.gz", type = "source")
-```
+## Getting Started
 
-or open the `R` project contained in the `EPmvnCDF/` folder and build it
-from there.
+1.  **Open the R Project**  
+    Open the R project file `DualProbitCDF.Rproj` and set it as your
+    working directory.
+
+2.  **Install the R Package**  
+    Install the included R package `EPmvnCDF`, which stands for  
+    *Expectation Propagation for the estimation of Multivariate Normal
+    Cumulative Distribution Functions*, via
+
+    ``` r
+    install.packages("EPmvnCDF_0.1.0.tar.gz", type = "source")
+    ```
+
+    Otheror open the `R` project contained in the `EPmvnCDF/` folder and
+    build it from there.
 
 Then you can run the code.
 
-In particular,
+In particular:
 
-- Scripts starting with letter `A` contain useful functions;
-- Scripts starting with letter `B` contain the code to run the four
-  methods. Results will be stored in the corresponding subfolder into
-  the `RDS/` folder;
-- The script starting with letter `C` contains the code to extract the
-  results from the saved `.RDS` files. Data frames will be created
-  created inside `RDS/`;
-- Scripts starting with letter `D` contain the code to produce the plots
-  showed in the paper. They will be saved in the folder `OUTPUT/`.
+- Scripts starting with the letter **`A`** contain utility functions
+  that are reused throughout the project.
+
+- Scripts starting with the letter **`B`** contain the code to run the
+  four estimation methods described in the main paper:
+
+  - our **Expectation Propagation (EP)** proposal, implemented using
+    both Cholesky and Eigenvalue decompositions;
+  - the **`TruncatedNormal`** package;
+  - the **`tlrmvnmvt`** package;
+  - the **Orthant method** by Ridgway (2016), implemented in **C++**
+    (see the `cpp_source/` directory).
+
+  The output of each method is stored in the corresponding subfolder
+  within the `RDS/` directory.
+
+- The `.Rmd` file starting with the letter **`C`** extracts and
+  processes the simulation results stored in the `.RDS` files. It
+  creates summary data frames (saved in `RDS/`) and saves the figures
+  used in the paper.
+
+- Scripts starting with the letter **`D`** reproduce an additional
+  simulation study included in the Supplementary Material.
