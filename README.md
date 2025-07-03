@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# EPmvnCDF Repository
+# DualProbitCDF Repository
 
 <!-- 
 [![Last Commit](https://img.shields.io/github/last-commit/fradenti/EPmvnCDF)](https://github.com/fradenti/EPmvnCDF)
