@@ -7,22 +7,16 @@
 [![Last Commit](https://img.shields.io/github/last-commit/fradenti/EPmvnCDF)](https://github.com/fradenti/EPmvnCDF)
  -->
 
-The repository **EPmvnCDF**, short for
-
-*Expectation propagation for the estimation of multivariate normal
-cumulative distribution functions*
-<!--**DUA**l probit marginal **L**ikelihood **E**stimation via **EP** **A**pproximation, -->
-
-contains the R package implementing the estimation strategy proposed in
+The repository **DualProbitCDF** contains the R package implementing the estimation strategy proposed in
 
 *‘’Multivariate Gaussian cumulative distribution functions as the
 marginal likelihood of their dual Bayesian probit model’’*  
-by A. Fasano and F. Denti
+by A. Fasano and F. Denti, published in **Biometrika (2025)**
 
 and the code needed to reproduce the simulation studies and the figures.
 
 First, set the working directory to this directory - you can open the R
-project `EPmvnCDF.Rproj`. Then, install the R package `EPmvnCDF`. You
+project `DualProbitCDF.Rproj`. Then, install the R package `EPmvnCDF`. You
 can either use the built versions via
 
 ``` r
