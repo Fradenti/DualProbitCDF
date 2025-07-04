@@ -6,7 +6,7 @@
 <!--**DUA**l probit marginal **L**ikelihood **E**stimation via **EP** **A**pproximation, -->
 
 [![Last
-Commit](https://img.shields.io/github/last-commit/fradenti/EPmvnCDF)](https://github.com/fradenti/EPmvnCDF)
+Commit](https://img.shields.io/github/last-commit/fradenti/DualProbitCDF)](https://github.com/fradenti/DualProbitCDF)
 
 The repository **DualProbitCDF** contains the R package and code
 implementing the estimation strategy proposed in the article:
