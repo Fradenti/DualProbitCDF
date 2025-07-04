@@ -13,7 +13,8 @@ implementing the estimation strategy proposed in the article:
 
 > *“Multivariate Gaussian cumulative distribution functions as the
 > marginal likelihood of their dual Bayesian probit model”* by A. Fasano
-> and F. Denti, published in **Biometrika (2025)**.
+> and F. Denti, accepted for publication in **Biometrika (2025, In
+> press)**.
 
 In addition to the package itself, the repository includes all the
 scripts needed to reproduce the simulation studies and the figures
@@ -31,11 +32,11 @@ presented in the paper.
     Cumulative Distribution Functions*, via
 
     ``` r
-    install.packages("EPmvnCDF_0.1.0.tar.gz", type = "source")
+    install.packages("EPmvnCDF_0.2.0.tar.gz", repos = NULL, type = "source")
     ```
 
-    Otheror open the `R` project contained in the `EPmvnCDF/` folder and
-    build it from there.
+    Otherwise open the `R` project contained in the `EPmvnCDF/` folder
+    and build the package from there.
 
 Then you can run the code.
 
@@ -49,8 +50,8 @@ In particular:
 
   - our **Expectation Propagation (EP)** proposal, implemented using
     both Cholesky and Eigenvalue decompositions;
-  - the **`TruncatedNormal`** package;
-  - the **`tlrmvnmvt`** package;
+  - the method in the **`TruncatedNormal`** package;
+  - the methods in the **`tlrmvnmvt`** package;
   - the **Orthant method** by Ridgway (2016), implemented in **C++**
     (see the `cpp_source/` directory).
 
@@ -60,7 +61,7 @@ In particular:
 - The `.Rmd` file starting with the letter **`C`** extracts and
   processes the simulation results stored in the `.RDS` files. It
   creates summary data frames (saved in `RDS/`) and saves the figures
-  used in the paper.
+  used in the paper (in `NewFigures/`).
 
 - Scripts starting with the letter **`D`** reproduce an additional
   simulation study included in the Supplementary Material.

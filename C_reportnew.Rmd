@@ -184,7 +184,7 @@ ggsave("NewFigures/DENSE_512_MAIN.pdf", width = 15, h=6)
 ```
 
 
-## probability curves
+## Probability curves
 
 ```{r}
 d1 <- results_epcB %>% 
@@ -240,7 +240,7 @@ ggsave("NewFigures/DENSE_LINES_1024_noleg.pdf", width = 15, h=6)
 
 
 
-# Fungible
+# Fungible  covariance matrices
 
 Import the results
 
@@ -414,7 +414,7 @@ plot1
 ggsave("NewFigures/FUNG_512_MAIN.pdf", width = 15, h=6)
 ```
 
-## probability curves
+## Probability curves
 
 ```{r}
 d1 <- results_epcB %>% 
@@ -785,7 +785,7 @@ ggsave("NewFigures/ConstALL_1024_long_time.pdf",width = 15, h=6)
 ```
 
 
-## probability curves
+## Probability curves
 
 ```{r}
 d2 <- results_epcB %>% 
