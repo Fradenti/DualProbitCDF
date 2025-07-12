@@ -116,7 +116,7 @@ Bs   <- seq(-2,2,length.out=20)
 sink("RDS/EP_CHOL/progress_EPChol.txt")
 fixedCOVs <- readRDS("RDS/00_all_covs_rhos.RDS")
 # CONSTANT CASE -------------------------------------------------
-for(j in 3:length(RHOs)){
+for(j in 1:length(RHOs)){
   for(i in 1:length(Ns)){
     PAR <- c()
     COV <- fixedCOVs[[i]][,,j]
