@@ -1,0 +1,806 @@
+## ------------------------------------------------------------------------------------------------------------------------
+library(tidyverse)
+library(patchwork)
+library(reshape2)
+library(latex2exp)
+theme_set(theme_bw())
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+results <- readRDS("RDS/ALL_dense_XtX_2025.RDS")
+table(results$algo)
+results$algo <- ifelse(results$algo == "RIDGEWAY", "Ridgway", results$algo) # to fix a misspelling
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+eca <- results %>% filter(algo == "EP_Chol_algo")
+ecb <- results %>% filter(algo == "EP_Chol_algoB")
+eea <- results %>% filter(algo == "EP_Eigen_algoA")
+eeb <- results %>% filter(algo == "EP_Eigen_algoB")
+pairs(cbind(eca$log2prob, ecb$log2prob, eea$log2prob, eeb$log2prob))
+pairs(cbind((ecb$log2prob-eca$log2prob)/eca$log2prob, 
+            (eea$log2prob-eca$log2prob)/eca$log2prob, 
+            (eeb$log2prob-eca$log2prob)/eca$log2prob ))
+boxplot(cbind((ecb$log2prob-eca$log2prob), 
+              (eea$log2prob-eca$log2prob), 
+              (eeb$log2prob-eca$log2prob)))
+TIM_dense <- cbind("CHOL A" = eca$time,
+              "CHOL B" = ecb$time, 
+              "EIG A" = eea$time, 
+              "EIG B" = eeb$time)
+
+
+DEP <- cbind("CA" = eca$log2prob, "CB" = ecb$log2prob, 
+             "EA" = eea$log2prob, "EA" = eeb$log2prob)
+
+REL_DELTA <- cbind("CHOL A vs CHOL B" = (eca$log2prob-ecb$log2prob)/ecb$log2prob, 
+              "EIGEN A vs CHOL B" =(eea$log2prob-ecb$log2prob)/ecb$log2prob, 
+              "EIGEN B vs CHOL B" =(eeb$log2prob-ecb$log2prob)/ecb$log2prob )
+
+dense_EP <- REL_DELTA %>% melt() %>% 
+ggplot()+
+  geom_boxplot(aes(y = value,x=Var2))+
+  xlab("")+ 
+  theme(text = element_text(size=15))
+dense_EP
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+results_epcB <- results %>% filter(algo != "EP_Eigen_algoA" , 
+                               algo != "EP_Eigen_algoB" , 
+                               algo != "EP_Chol_algo")
+table(results_epcB$algo)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+long_epcb    <- results_epcB %>% filter(algo == "EP_Chol_algoB") %>% pull(log2prob) %>% rep(4)
+long_time    <- results_epcB %>% filter(algo == "EP_Chol_algoB") %>% pull(time) %>% rep(4)
+long_bot_err <- results_epcB %>% filter(algo == "Botev") %>% pull(info) %>% as.numeric %>% rep(4)
+
+
+d1 <- results_epcB %>% mutate(log2ep = long_epcb[1:4600], err = long_bot_err[1:4600]) %>%
+  mutate(log2relative = (log2prob-log2ep)/log2ep, log2delta = (log2prob-log2ep),
+         lowerr= (log2(2^log2prob*(1-err))-log2ep)/log2ep,
+         upperr= (log2(2^log2prob*(1+err))-log2ep)/log2ep) %>% 
+  group_by(b, dim, algo) %>% mutate(mlowerr=mean(lowerr, na.rm=TRUE),
+                                 mupperr=mean(upperr, na.rm=TRUE)) %>% ungroup() %>% 
+  filter(algo != "EP_Chol_algoB") %>% mutate(mlowerr2 = case_when(algo != "Botev"~NA,
+                                                                  algo == "Botev"~mlowerr),
+                                             mupperr2 = case_when(algo != "Botev"~NA,
+                                                                  algo == "Botev"~mupperr)) %>% 
+  mutate( dimf = paste("m =",dim))
+
+d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                          "m = 512","m = 1024"))
+
+plot1 = ggplot()+
+  geom_hline(data=d1, aes(yintercept = 0),col=2)+
+  geom_path(data=d1, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d1, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d1, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d1 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d1 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+
+
+plot1
+ggsave("NewFigures/DENSE_1024.pdf",width = 12, h=6)
+ggsave("NewFigures/DENSE_1024_long.pdf",width = 15, h=6)
+
+
+d11 <- d1 %>% filter( dim < 1024)
+plot1 = ggplot()+
+  geom_hline(data=d11, aes(yintercept = 0),col=2)+
+  geom_path(data=d11, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d11, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d11, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d11 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+plot1
+ggsave("NewFigures/DENSE_512.pdf",width = 10, h=6)
+ggsave("NewFigures/DENSE_512_long.pdf",width = 15, h=6)
+
+
+t1 <- results_epcB %>% mutate(timeep = long_time[1:4600]) %>%
+  mutate(timerelative = (time)/timeep) %>%  
+  filter(algo != "EP_Chol_algoB") %>% 
+  mutate( dimf = paste("m =",dim))
+
+t1$dimf <- factor(t1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                          "m = 512","m = 1024"))
+
+time1 <- ggplot(t1 %>% filter(dim<1024))+
+  geom_hline(aes(yintercept = 1),col=2)+
+  geom_boxplot(aes(x = b,
+                   y = timerelative, group = b),
+               outlier.shape = NA)+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Ratio between computational times"))+
+  xlab(TeX("c"))+
+  scale_y_log10()+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+time1
+ggsave("NewFigures/DENSE_512_time.pdf",width = 10, h=6)
+ggsave("NewFigures/DENSE_512_long_time.pdf",width = 15, h=6)
+L <- ggplot(t1)+
+  geom_hline(aes(yintercept = 1),col=2)+
+  geom_boxplot(aes(x = b,
+                   y = timerelative, group = b),
+               outlier.shape = NA)+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Ratio between computational times"))+
+  xlab(TeX("c"))+
+  scale_y_log10()+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+L
+ggsave("NewFigures/DENSE_1024_time.pdf",width = 10, h=6)
+ggsave("NewFigures/DENSE_1024_long_time.pdf",width = 15, h=6)
+
+d11 <- d1 %>% filter( dim %in% c(16, 256, 512))
+plot1 = ggplot()+
+  geom_hline(data=d11, aes(yintercept = 0),col=2)+
+  geom_path(data=d11, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d11, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d11, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d11 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+plot1
+ggsave("NewFigures/DENSE_512_MAIN.pdf", width = 15, h=6)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+d1 <- results_epcB %>% 
+  mutate(log2prob2 = case_when(!is.finite(log2prob)~NA,
+                               TRUE ~ log2prob)) %>%
+  group_by(b, dim, algo) %>% mutate(ml2p = mean(log2prob2, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  mutate( dimf = paste("m =",dim))
+
+d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                                      "m = 512","m = 1024"))
+d1 <- 
+d1 %>% mutate(algo = case_when(algo == "EP_Chol_algoB"~ "EP Chol. Alg. 2",
+                               TRUE ~ algo))
+d11 <- d1
+broken = d11 %>% filter(is.na(log2prob2)) %>% group_by(algo, dimf) %>% reframe(maxb = max(b))
+
+ggplot()+
+  geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d11, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_wrap(~dimf, scale="free_y")+
+  geom_point(data = d11 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "bottom")
+ggsave("NewFigures/DENSE_LINES_1024.pdf", width = 15, h=6)
+
+
+ggplot()+
+  geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d11, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_wrap(~dimf, scale="free_y")+
+  geom_point(data = d11 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "none")
+ggsave("NewFigures/DENSE_LINES_1024_noleg.pdf", width = 15, h=6)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+results <- readRDS("RDS/ALL_fungible_2025.RDS")
+table(results$algo)
+results$algo <- ifelse(results$algo == "RIDGEWAY", "Ridgway", results$algo)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+eca <- results %>% filter(algo == "EP_Chol_algo") # it is algo A
+ecb <- results %>% filter(algo == "EP_Chol_algoB")
+eea <- results %>% filter(algo == "EP_Eigen_algoA")
+eeb <- results %>% filter(algo == "EP_Eigen_algoB")
+pairs(cbind(eca$log2prob, ecb$log2prob, eea$log2prob, eeb$log2prob))
+pairs(cbind((ecb$log2prob-eca$log2prob)/eca$log2prob, 
+            (eea$log2prob-eca$log2prob)/eca$log2prob, 
+            (eeb$log2prob-eca$log2prob)/eca$log2prob ))
+boxplot(cbind((ecb$log2prob-eca$log2prob), 
+              (eea$log2prob-eca$log2prob), 
+              (eeb$log2prob-eca$log2prob)))
+TIM_fung <- cbind("CHOL A" = eca$time,
+              "CHOL B" = ecb$time, 
+              "EIG A" = eea$time, 
+              "EIG B" = eeb$time)
+
+
+DEP <- cbind("CA" = eca$log2prob, "CB" = ecb$log2prob, 
+             "EA" = eea$log2prob, "EA" = eeb$log2prob)
+
+REL_DELTA <- cbind("CHOL A vs CHOL B" = (eca$log2prob-ecb$log2prob)/ecb$log2prob, 
+                   "EIGEN A vs CHOL B" =(eea$log2prob-ecb$log2prob)/ecb$log2prob, 
+               "EIGEN B vs CHOL B" =(eeb$log2prob-ecb$log2prob)/ecb$log2prob )
+
+fung_EP <- REL_DELTA %>% melt() %>% 
+ggplot()+
+  geom_boxplot(aes(y = value,x=Var2))+
+  xlab("")+ 
+  theme(text = element_text(size=15))
+
+fung_EP
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+results_epcB <- results %>% filter(algo != "EP_Eigen_algoA" , 
+                               algo != "EP_Eigen_algoB" , 
+                               algo != "EP_Chol_algo")
+table(results_epcB$algo)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+long_epcb    <- results_epcB %>% filter(algo == "EP_Chol_algoB") %>% pull(log2prob) %>% rep(4)
+long_time    <- results_epcB %>% filter(algo == "EP_Chol_algoB") %>% pull(time) %>% rep(4)
+long_bot_err <- results_epcB %>% filter(algo == "Botev") %>% pull(info) %>% as.numeric %>% rep(4)
+
+
+d1 <- results_epcB %>% mutate(log2ep = long_epcb[1:4600], err = long_bot_err[1:4600]) %>%
+  mutate(log2relative = (log2prob-log2ep)/log2ep, log2delta = (log2prob-log2ep),
+         lowerr= (log2(2^log2prob*(1-err))-log2ep)/log2ep,
+         upperr= (log2(2^log2prob*(1+err))-log2ep)/log2ep) %>% 
+  group_by(b, dim, algo) %>% mutate(mlowerr=mean(lowerr, na.rm=TRUE),
+                                 mupperr=mean(upperr, na.rm=TRUE)) %>% ungroup() %>% 
+  filter(algo != "EP_Chol_algoB") %>% mutate(mlowerr2 = case_when(algo != "Botev"~NA,
+                                                                  algo == "Botev"~mlowerr),
+                                             mupperr2 = case_when(algo != "Botev"~NA,
+                                                                  algo == "Botev"~mupperr)) %>% 
+  mutate( dimf = paste("m =",dim))
+
+d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                          "m = 512","m = 1024"))
+
+plot1 = ggplot()+
+  geom_hline(data=d1, aes(yintercept = 0),col=2)+
+  geom_path(data=d1, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d1, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d1, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d1 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d1 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+
+
+plot1
+ggsave("NewFigures/FUNG_1024.pdf",width = 12, h=6)
+ggsave("NewFigures/FUNG_1024_long.pdf",width = 15, h=6)
+
+
+d11 <- d1 %>% filter( dim < 1024)
+plot1 = ggplot()+
+  geom_hline(data=d11, aes(yintercept = 0),col=2)+
+  geom_path(data=d11, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d11, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d11, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d11 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+plot1
+ggsave("NewFigures/FUNG_512.pdf",width = 10, h=6)
+ggsave("NewFigures/FUNG_512_long.pdf",width = 15, h=6)
+
+
+t1 <- results_epcB %>% mutate(timeep = long_time[1:4600]) %>%
+  mutate(timerelative = (time)/timeep) %>%  
+  filter(algo != "EP_Chol_algoB") %>% 
+  mutate( dimf = paste("m =",dim))
+
+t1$dimf <- factor(t1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                          "m = 512","m = 1024"))
+
+time1 <- ggplot(t1 %>% filter(dim<1024))+
+  geom_hline(aes(yintercept = 1),col=2)+
+  geom_boxplot(aes(x = b,
+                   y = timerelative, group = b),
+               outlier.shape = NA)+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Ratio between computational times"))+
+  xlab(TeX("c"))+
+  scale_y_log10()+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+time1
+ggsave("NewFigures/FUNG_512_time.pdf",width = 10, h=6)
+ggsave("NewFigures/FUNG_512_long_time.pdf",width = 15, h=6)
+
+L <- ggplot(t1)+
+  geom_hline(aes(yintercept = 1),col=2)+
+  geom_boxplot(aes(x = b,
+                   y = timerelative, group = b),
+               outlier.shape = NA)+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Ratio between computational times"))+
+  xlab(TeX("c"))+
+  scale_y_log10()+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+L
+ggsave("NewFigures/FUNG_1024_time.pdf",width = 10, h=6)
+ggsave("NewFigures/FUNG_1024_long_time.pdf",width = 15, h=6)
+
+
+d11 <- d1 %>% filter( dim %in% c(16, 256, 512))
+plot1 = ggplot()+
+  geom_hline(data=d11, aes(yintercept = 0),col=2)+
+  geom_path(data=d11, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d11, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d11, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d11 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+plot1
+ggsave("NewFigures/FUNG_512_MAIN.pdf", width = 15, h=6)
+ggsave("NewFigures/MAIN_FIGURE1.pdf", width = 15, h=6)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+d1 <- results_epcB %>% 
+  mutate(log2prob2 = case_when(!is.finite(log2prob)~NA,
+                               TRUE ~ log2prob)) %>%
+  group_by(b, dim, algo) %>% mutate(ml2p = mean(log2prob2, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  mutate( dimf = paste("m =",dim))
+
+d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                                      "m = 512","m = 1024"))
+d1 <- 
+d1 %>% mutate(algo = case_when(algo == "EP_Chol_algoB"~ "EP Chol. Alg. 2",
+                               TRUE ~ algo))
+d11 <- d1
+broken = d11 %>% filter(is.na(log2prob2)) %>% group_by(algo, dimf) %>% reframe(maxb = max(b))
+
+ggplot()+
+  geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d11, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_wrap(~dimf, scale="free_y")+
+  geom_point(data = d11 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "bottom")
+ggsave("NewFigures/FUNG_LINES_1024.pdf", width = 15, h=6)
+
+ggplot()+
+  geom_line(data=d11, aes(x=b,y=ml2p, col=algo))+
+  geom_point(data = d11, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  facet_wrap(~dimf, scale="free_y")+
+  geom_point(data = d11 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "none")
+ggsave("NewFigures/FUNG_LINES_1024_noleg.pdf", width = 15, h=6)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+results <- readRDS("RDS/ALL_rhofixed_2025.RDS")
+truth   <- readRDS("RDS/00_trueLOGProbs_constantSigma.RDS")
+table(results$algo)
+results$algo <- ifelse(results$algo == "RIDGEWAY", "Ridgway", results$algo)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+eca <- results %>% filter(algo == "EP_Chol_algoA")
+ecb <- results %>% filter(algo == "EP_Chol_algoB")
+eea <- results %>% filter(algo == "EP_Eigen_algoA")
+eeb <- results %>% filter(algo == "EP_Eigen_algoB")
+pairs(cbind(eca$log2prob, ecb$log2prob, eea$log2prob, eeb$log2prob))
+pairs(cbind((ecb$log2prob-eca$log2prob)/eca$log2prob, 
+            (eea$log2prob-eca$log2prob)/eca$log2prob, 
+            (eeb$log2prob-eca$log2prob)/eca$log2prob ))
+
+boxplot(cbind((ecb$log2prob-eca$log2prob), 
+              (eea$log2prob-eca$log2prob), 
+              (eeb$log2prob-eca$log2prob)))
+TIM_const <- cbind("CHOL A" = eca$time,
+              "CHOL B" = ecb$time, 
+              "EIG A" = eea$time, 
+              "EIG B" = eeb$time)
+
+DEP <- cbind("CA" = eca$log2prob, "CB" = ecb$log2prob, 
+             "EA" = eea$log2prob, "EA" = eeb$log2prob)
+
+REL_DELTA <- cbind("CHOL A vs CHOL B" = (eca$log2prob-ecb$log2prob)/ecb$log2prob, 
+              "EIGEN A vs CHOL B" =(eea$log2prob-ecb$log2prob)/ecb$log2prob, 
+              "EIGEN B vs CHOL B" =(eeb$log2prob-ecb$log2prob)/ecb$log2prob )
+
+const_EP <- 
+REL_DELTA %>% melt() %>% 
+ggplot()+
+  geom_boxplot(aes(y = value,x=Var2))+
+  xlab("")+ 
+  theme(text = element_text(size=15))
+
+const_EP
+
+pp1 <- (dense_EP+coord_flip()+fung_EP+coord_flip()+const_EP+coord_flip())
+pp1
+
+q1 = dense_EP$data %>% as_tibble() %>% mutate(type = "Dense Cov.")
+q2 = fung_EP$data %>% as_tibble() %>% mutate(type = "Fungible Cov.")
+q3 = const_EP$data %>% as_tibble() %>% mutate(type = "Constant Cov.")
+all_EP <- bind_rows(q1,q2,q3)
+table(all_EP$Var2)
+all_EP <- all_EP %>% mutate(Var3 = case_when(Var2 == "CHOL A vs CHOL B" ~ "Chol. Alg. 1 vs\nChol. Alg. 2",
+                                             Var2 == "EIGEN A vs CHOL B" ~ "Eig. Alg. 1 vs\nChol. Alg. 2",
+                                             Var2 == "EIGEN B vs CHOL B" ~ "Eig. Alg. 2 vs\nChol. Alg. 2"))
+
+plotEP <- all_EP %>% as_tibble() %>% 
+  ggplot()+facet_wrap(~type)+
+  geom_hline(yintercept = 0,col=2)+
+  geom_boxplot(aes(x = Var3, y = value))+
+  xlab("") + ylab(TeX("Relative difference in $log_2$ probabilities"))+
+    theme(text = element_text(size=15))#+coord_flip()
+plotEP
+ggsave(filename = "NewFigures/logratio_prob_EP.pdf",h=5,w=15)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+q1 = TIM_dense %>% as_tibble() %>% mutate(type = "Dense Cov.")
+q2 = TIM_fung %>% as_tibble() %>% mutate(type = "Fungible Cov.")
+q3 = TIM_const %>% as_tibble() %>% mutate(type = "Constant Cov.")
+alltime_EP <- bind_rows(q1,q2,q3)
+Meltime <- melt(alltime_EP,"type")
+table(Meltime$variable)
+all_EP <- Meltime %>% mutate(Var3 = case_when(variable == "CHOL A" ~ "Chol. Alg. 1",
+                                              variable == "CHOL B" ~ "Chol. Alg. 2",
+                                              variable ==  "EIG A" ~ "Eig. Alg. 1",
+                                              variable ==  "EIG B" ~ "Eig. Alg. 2"))
+
+plotEP <- all_EP %>% as_tibble() %>% 
+  ggplot()+facet_wrap(~type)+
+  geom_hline(yintercept = 0,col=2)+
+  geom_boxplot(aes(x = Var3, y = value))+
+  xlab("") + ylab(TeX("Seconds"))+
+    theme(text = element_text(size=15))#+coord_flip()
+plotEP
+ggsave("NewFigures/times_EP.pdf",h=5,w=15)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+q1 = TIM_dense %>% as_tibble() %>% mutate(type = "Dense Cov.") %>% mutate(
+  CACB = `CHOL A`/`CHOL B`,
+  EACB = `EIG A`/`CHOL B`,EBCB = `EIG B`/`CHOL B`
+)
+q2 = TIM_fung %>% as_tibble() %>% mutate(type = "Fungible Cov.") %>% mutate(
+  CACB = `CHOL A`/`CHOL B`,
+  EACB = `EIG A`/`CHOL B`,EBCB = `EIG B`/`CHOL B`
+)
+q3 = TIM_const %>% as_tibble() %>% mutate(type = "Constant Cov.") %>% mutate(
+  CACB = `CHOL A`/`CHOL B`,
+  EACB = `EIG A`/`CHOL B`,EBCB = `EIG B`/`CHOL B`
+)
+
+alltime_EP <- bind_rows(q1,q2,q3) %>% select(type,CACB,EACB,EBCB)
+Meltime <- melt(alltime_EP,"type")
+table(Meltime$variable)
+all_EP <- Meltime %>% mutate(Var3 = case_when(variable == "CACB" ~ "Chol. Alg. 1/\nChol. Alg. 2",
+                                              variable ==  "EACB" ~ "Eig. Alg. 1/\nChol. Alg. 2",
+                                              variable ==  "EBCB" ~ "Eig. Alg. 2/\nChol. Alg. 2"))
+plotEP <- all_EP %>% as_tibble() %>% 
+  ggplot()+facet_wrap(~type)+
+  geom_hline(yintercept = 1,col=2)+
+  geom_boxplot(aes(x = Var3, y = value))+
+  xlab("") + scale_y_log10()+
+    ylab(TeX("Ratio between computational times"))+
+    theme(text = element_text(size=15))#+coord_flip()
+plotEP
+ggsave("NewFigures/ratio_of_times_EP_log10.pdf",h=5,w=15)
+
+plotEP <- all_EP %>% as_tibble() %>% 
+  ggplot()+facet_wrap(~type)+
+  geom_hline(yintercept = 1,col=2)+
+  geom_boxplot(aes(x = Var3, y = value))+
+  xlab("") + 
+    ylab(TeX("Ratio between computational times"))+
+    theme(text = element_text(size=15))#+coord_flip()
+plotEP
+ggsave("NewFigures/ratio_of_times_EP.pdf",h=5,w=15)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+results_epcB <- results %>% filter(algo != "EP_Eigen_algoA" , 
+                                   algo != "EP_Eigen_algoB" , 
+                                   algo != "EP_Chol_algoA")
+table(results_epcB$algo)
+results_epcB <- results_epcB %>% left_join(truth %>% rename(dim = Ns),by = c("b","dim","rho")) %>% 
+                                  mutate(log2true = (Truep) / log(2))
+table(results_epcB$algo)
+sum(is.na(results_epcB$log2true))
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+long_time    <- results_epcB %>% filter(algo == "EP_Chol_algoB") %>% pull(time) %>% rep(4)
+
+d1 <- results_epcB %>%
+  mutate(log2relative = (log2prob-log2true)/log2true, 
+         log2delta = (log2prob-log2true),
+         err = as.numeric(info),
+         lowerr= (log2(2^log2prob*(1-err))-log2true)/log2true,
+         upperr= (log2(2^log2prob*(1+err))-log2true)/log2true) %>% 
+  group_by(algo, rho, dim, b) %>% 
+  mutate(mlowerr=mean(lowerr, na.rm=TRUE),
+         mupperr=mean(upperr, na.rm=TRUE)) %>% 
+  ungroup() %>% mutate(mlowerr2 = case_when(algo != "Botev"~NA,
+                                                                  algo == "Botev"~mlowerr),
+                                             mupperr2 = case_when(algo != "Botev"~NA,
+                                                                  algo == "Botev"~mupperr)) %>% 
+  mutate( dimf = paste("m =",dim))
+
+d1 <- d1 %>% mutate(algo = case_when(algo == "EP_Chol_algoB"~"EP Chol. Alg. 2", TRUE ~ algo))
+d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                          "m = 512","m = 1024"))
+d1$algo <- factor(d1$algo,levels =  c("Botev","EP Chol. Alg. 2","TLRank","Ridgway"))
+
+
+d0 = d1
+
+plots = function(d0,rho_val){
+  L = list()
+  d11 <- d0 %>% filter(rho==rho_val) 
+L[[1]] <- 
+  
+  ggplot()+
+  geom_hline(data=d11, aes(yintercept = 0),col=2)+
+  geom_path(data=d11, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d11, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d11, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d11 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+
+d11 = d11 %>% filter(dim<1024)
+L[[2]] <-   
+  ggplot()+
+  geom_hline(data=d11, aes(yintercept = 0),col=2)+
+  geom_path(data=d11, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d11, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d11, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d11 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+
+d11 = d11 %>% filter(dim %in% c(16, 256, 512))
+L[[3]] <-   
+  ggplot()+
+  geom_hline(data=d11, aes(yintercept = 0),col=2)+
+  geom_path(data=d11, aes(x=b, y = c(mlowerr2)),col=4)+
+  geom_path(data=d11, aes(x=b, y = c(mupperr2)),col=4)+
+  geom_boxplot(data=d11, aes(x = b,
+                   y = log2relative, group = b),outlier.shape = NA)+
+  geom_point(data=d11 %>% filter(is.na(log2prob)),aes(x=b,y=0),pch="x",col="darkred")+
+  geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Relative difference in $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+return(L)
+}
+
+
+l00 = plots(d1,00)
+l00[[1]]
+ggsave("NewFigures/Const00_1024.pdf",width = 12, h=6)
+ggsave("NewFigures/Const00_1024_long.pdf",width = 15, h=6)
+l00[[2]]
+ggsave("NewFigures/Const00_512.pdf",width = 10, h=6)
+ggsave("NewFigures/Const00_512_long.pdf",width = 15, h=6)
+l00[[3]]
+ggsave("NewFigures/Const00_512_MAIN.pdf",h = 9, w=15)
+
+l25 = plots(d1,.25)
+l25[[1]]
+ggsave("NewFigures/Const25_1024.pdf",width = 10, h=6)
+ggsave("NewFigures/Const25_long_1024.pdf",width = 15, h=6)
+l25[[2]]
+ggsave("NewFigures/Const25_512.pdf",width = 10, h=6)
+ggsave("NewFigures/Const25_512_long.pdf",width = 15, h=6)
+l25[[3]]
+ggsave("NewFigures/Const25_512_MAIN.pdf",h = 9, w=15)
+
+l50 = plots(d1,.50)
+l50[[1]]
+ggsave("NewFigures/Const50_1024.pdf",width = 10, h=6)
+ggsave("NewFigures/Const50_1024_long.pdf",width = 15, h=6)
+l50[[2]]
+ggsave("NewFigures/Const50_512.pdf",width = 10, h=6)
+ggsave("NewFigures/Const50_512_long.pdf",width = 15, h=6)
+l50[[3]]
+ggsave("NewFigures/Const50_512_MAIN.pdf",h = 9, w=15)
+ggsave("NewFigures/MAIN_FIGURE2.pdf",h = 9, w=15)
+
+
+
+l75 = plots(d1,.75)
+l75[[1]]
+ggsave("NewFigures/Const75_1024.pdf",h = 9, w=15)
+ggsave("NewFigures/Const75_1024_long.pdf",width = 15, h=6)
+l75[[2]]
+ggsave("NewFigures/Const75_512.pdf",width = 10, h=6)
+ggsave("NewFigures/Const75_512_long.pdf",width = 15, h=6)
+l75[[3]]
+ggsave("NewFigures/Const75_512_MAIN.pdf",width = 9, h=15)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+t1 <- results_epcB %>% mutate(timeep = long_time[1:18400]) %>%
+  mutate(timerelative = (time)/timeep) %>%  
+  filter(algo != "EP_Chol_algoB") %>% 
+  mutate( dimf = paste("m =",dim))
+
+table(t1$algo)
+t1$algo <- factor(t1$algo,levels =  c("Botev", "TLRank", "Ridgway"))
+
+
+t1$dimf <- factor(t1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
+                          "m = 512","m = 1024"))
+
+L <- ggplot(t1 %>% filter(dim<1024))+
+  geom_hline(aes(yintercept = 1),col=2)+
+  geom_boxplot(aes(x = b,
+                   y = timerelative, group = b),
+               outlier.shape = NA)+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Ratio between computational times"))+
+  xlab(TeX("c"))+
+  scale_y_log10()+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+L
+ggsave("NewFigures/ConstALL_512_time.pdf",width = 10, h=6)
+ggsave("NewFigures/ConstALL_512_long_time.pdf",width = 15, h=6)
+
+L <- ggplot(t1)+
+  geom_hline(aes(yintercept = 1),col=2)+
+  geom_boxplot(aes(x = b,
+                   y = timerelative, group = b),
+               outlier.shape = NA)+
+  facet_grid(algo~dimf)+
+  ylab(TeX("Ratio between computational times"))+
+  xlab(TeX("c"))+
+  scale_y_log10()+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1))
+L
+ggsave("NewFigures/ConstALL_1024_time.pdf",width = 10, h=6)
+ggsave("NewFigures/ConstALL_1024_long_time.pdf",width = 15, h=6)
+
+
+## ------------------------------------------------------------------------------------------------------------------------
+d2 <- results_epcB %>% 
+  mutate(log2prob2 = case_when(!is.finite(log2prob)~NA,
+                               TRUE ~ log2prob)) %>%
+  group_by(b, rho,#######
+           dim, algo) %>% mutate(ml2p = mean(log2prob2, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  mutate( dimf = paste("m ==",dim),
+          rhof = paste0("rho ==",rho),
+          )
+d2 <- 
+d2 %>% mutate(algo = case_when(algo == "EP_Chol_algoB"~ "EP Chol. Alg. 2",
+                               TRUE ~ algo))
+
+d2$dimf <- factor(d2$dimf,levels =  c("m == 16","m == 64","m == 128","m == 256",
+                                      "m == 512","m == 1024"))
+d2$rhof <- factor(d2$rhof)#,levels =  c("$\\rho = 0","m = 64","m = 128","m = 256",
+                           #           "m = 512","m = 1024"))
+
+table(d2$algo)
+d2$algo <- factor(d2$algo, levels = c("Botev", 
+                                      "EP Chol. Alg. 2",   
+                                      "TLRank" ,     "Ridgway"))
+
+broken <- d2 %>% filter(is.na(log2prob2)) %>% group_by(algo, rhof, dimf) %>% 
+  reframe(maxb = max(b)) 
+
+ggplot()+
+  geom_line(data=d2, aes(x=b,y=ml2p, col=algo)) +
+  geom_point(data = d2, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2) +
+  facet_grid(rhof~dimf, scale="free_y", label = label_parsed) +
+  geom_point(data = d2 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|") +
+  geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "bottom")
+ggsave("NewFigures/RHO_LINES_1024.pdf", width = 15, h=9)
+
+
+
+ggplot(d2)+
+  geom_line(data=d2, aes(x=b,y=ml2p, col=algo))+
+  facet_grid( rhof ~ dimf, scale="free_y", label = label_parsed)+
+  geom_point(data = d2, aes(x = b,
+                             y = log2prob2, group = b, col=algo), alpha=.2)+
+  geom_point(data = d2 %>% filter(is.na(log2prob2)),
+            aes(x=b,y=0, col=algo), pch="|")+
+  geom_vline(data=broken,aes(xintercept = maxb,
+                             col=algo, lty = algo))+
+  ylab(TeX("Estimated $log_2$ probabilities"))+
+  xlab(TeX("c"))+
+  scale_color_manual("Algorithm", values = c(1,2,3,4))+
+  scale_linetype(guide=FALSE)+
+  theme(text = element_text(size=15), 
+        axis.text.x = element_text(angle = 00, hjust = 1),
+        legend.position = "none")
+ggsave("NewFigures/RHO_LINES_1024_noleg.pdf", width = 15, h=9)
+

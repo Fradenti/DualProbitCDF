@@ -157,7 +157,7 @@ EP_EIG_algo1 = function(covM, b_vec, eps, tol, type){
 }
 
 ## EP Eig Algo1  --------------------------------------------------------
-Orthants_Ridgeway = function(covM, b_vec, M = 1e4, verb = F, ESS_fraction = .5, type){
+Orthants_Ridgway = function(covM, b_vec, M = 1e4, verb = F, ESS_fraction = .5, type){
   n <- nrow(covM)
   startTime0 <- Sys.time()
   orthant_p <- ridgway_smc_cpp(x = b_vec,
@@ -170,7 +170,7 @@ Orthants_Ridgeway = function(covM, b_vec, M = 1e4, verb = F, ESS_fraction = .5, 
     log2prob = orthant_p$logCDF/log(2), 
     time = tim3, 
     type = type, #paste0("M=", M),
-    algo = "RIDGEWAY",
+    algo = "Ridgway",
     b = b_vec[1],
     dim = n,
     info =paste0("M = ", M,"-ESSf = ",ESS_fraction))

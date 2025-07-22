@@ -14,7 +14,7 @@ colnames(PROBS_BOTEV) <- colnames(PROBS_GENZ) <- colnames(PROBS_RIDGE) <- NSAMPL
 
 a1 = PROBS_BOTEV %>% reshape2::melt() %>% mutate(algo = "Botev")
 a2 = PROBS_GENZ %>% reshape2::melt() %>% mutate(algo = "Genz/TLRank")
-a3 = PROBS_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgeway")
+a3 = PROBS_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgway")
 
 A_rho <- a1 %>% bind_rows(a2,a3) %>% mutate(cov = factor("Case~(ii)*','~rho==0.5") )
 ep_rho <- readRDS("RDS/Comparison_in_0/rho05_EPCHOL2_log2P_256.RDS")
@@ -29,7 +29,7 @@ colnames(PROBS_BOTEV) <- colnames(PROBS_GENZ) <- colnames(PROBS_RIDGE) <- NSAMPL
 
 a1 = PROBS_BOTEV %>% reshape2::melt() %>% mutate(algo = "Botev")
 a2 = PROBS_GENZ %>% reshape2::melt() %>% mutate(algo = "Genz/TLRank")
-a3 = PROBS_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgeway")
+a3 = PROBS_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgway")
 
 A_fung <- a1 %>% bind_rows(a2,a3) %>% mutate(cov = "Case (i)")
 ep_fung <- readRDS("RDS/Comparison_in_0/fung_EPCHOL2_log2P_256.RDS")
@@ -45,7 +45,7 @@ colnames(PROBS_BOTEV) <- colnames(PROBS_GENZ) <- colnames(PROBS_RIDGE) <- NSAMPL
 
 a1 = PROBS_BOTEV %>% reshape2::melt() %>% mutate(algo = "Botev")
 a2 = PROBS_GENZ %>% reshape2::melt() %>% mutate(algo = "Genz/TLRank")
-a3 = PROBS_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgeway")
+a3 = PROBS_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgway")
 
 A_dense <- a1 %>% bind_rows(a2,a3) %>% mutate(cov = "Case (iii)")
 ep_dense <- readRDS("RDS/Comparison_in_0/Dense_EPCHOL2_log2P_256.RDS")
@@ -96,7 +96,7 @@ colnames(TIMES_BOTEV) <- colnames(TIMES_GENZ) <- colnames(TIMES_RIDGE) <- NSAMPL
 
 a1 = TIMES_BOTEV %>% reshape2::melt() %>% mutate(algo = "Botev")
 a2 = TIMES_GENZ %>% reshape2::melt() %>% mutate(algo = "Genz/TLRank")
-a3 = TIMES_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgeway")
+a3 = TIMES_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgway")
 
 A_rho <- a1 %>% bind_rows(a2,a3) %>% mutate(cov = factor("Case~(ii)*','~rho==0.5"))
 ep_rho <- readRDS("RDS/Comparison_in_0/rho05_EPCHOL2_times_256.RDS")
@@ -112,7 +112,7 @@ colnames(TIMES_BOTEV) <- colnames(TIMES_GENZ) <- colnames(TIMES_RIDGE) <- NSAMPL
 
 a1 = TIMES_BOTEV %>% reshape2::melt() %>% mutate(algo = "Botev")
 a2 = TIMES_GENZ %>% reshape2::melt() %>% mutate(algo = "Genz/TLRank")
-a3 = TIMES_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgeway")
+a3 = TIMES_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgway")
 
 A_fung <- a1 %>% bind_rows(a2,a3) %>% mutate(cov = "Case (i)")
 ep_fung <- readRDS("RDS/Comparison_in_0/fung_EPCHOL2_times_256.RDS")
@@ -128,7 +128,7 @@ colnames(TIMES_BOTEV) <- colnames(TIMES_GENZ) <- colnames(TIMES_RIDGE) <- NSAMPL
 
 a1 = TIMES_BOTEV %>% reshape2::melt() %>% mutate(algo = "Botev")
 a2 = TIMES_GENZ %>% reshape2::melt() %>% mutate(algo = "Genz/TLRank")
-a3 = TIMES_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgeway")
+a3 = TIMES_RIDGE %>% reshape2::melt() %>% mutate(algo = "Ridgway")
 
 A_dense <- a1 %>% bind_rows(a2,a3) %>% mutate(cov = "Case (iii)")
 ep_dense <- readRDS("RDS/Comparison_in_0/Dense_EPCHOL2_times_256.RDS")

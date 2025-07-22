@@ -8,7 +8,7 @@ library("tlrmvnmvt")
 library("mvtnorm")
 library("tidyverse")
 library("EPmvnCDF")
-Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+Rcpp::sourceCpp("cpp_source/ridgway_cpp.cpp")
 
 # Useful functions --------------------------------------------------------
 

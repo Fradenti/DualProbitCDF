@@ -19,7 +19,7 @@ Import the results
 ```{r}
 results <- readRDS("RDS/ALL_dense_XtX_2025.RDS")
 table(results$algo)
-results$algo <- ifelse(results$algo == "RIDGEWAY", "Ridgeway", results$algo)
+results$algo <- ifelse(results$algo == "Ridgway", "Ridgway", results$algo)
 ```
 
 - First, we make sure that all EP algorithm specifications provide very similar results
@@ -99,7 +99,7 @@ plot1 = ggplot()+
   geom_point(data=d1 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 
@@ -120,7 +120,7 @@ plot1 = ggplot()+
   geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 plot1
@@ -143,7 +143,7 @@ time1 <- ggplot(t1 %>% filter(dim<1024))+
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
   ylab(TeX("Ratio between computational times"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
@@ -157,7 +157,7 @@ L <- ggplot(t1)+
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
   ylab(TeX("Ratio between computational times"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
@@ -176,7 +176,7 @@ plot1 = ggplot()+
   geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 plot1
@@ -211,7 +211,7 @@ ggplot()+
             aes(x=b,y=0, col=algo), pch="|")+
   geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
   ylab(TeX("Estimated $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_color_manual("Algorithm", values = c(1,2,3,4))+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
@@ -229,7 +229,7 @@ ggplot()+
             aes(x=b,y=0, col=algo), pch="|")+
   geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
   ylab(TeX("Estimated $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_color_manual("Algorithm", values = c(1,2,3,4))+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
@@ -247,7 +247,7 @@ Import the results
 ```{r}
 results <- readRDS("RDS/ALL_fungible_2025.RDS")
 table(results$algo)
-results$algo <- ifelse(results$algo == "RIDGEWAY", "Ridgeway", results$algo)
+results$algo <- ifelse(results$algo == "Ridgway", "Ridgway", results$algo)
 ```
 
 - First, we make sure that all EP algorithm specifications provide very similar results
@@ -328,7 +328,7 @@ plot1 = ggplot()+
   geom_point(data=d1 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 
@@ -349,7 +349,7 @@ plot1 = ggplot()+
   geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 plot1
@@ -372,7 +372,7 @@ time1 <- ggplot(t1 %>% filter(dim<1024))+
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
   ylab(TeX("Ratio between computational times"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
@@ -387,7 +387,7 @@ L <- ggplot(t1)+
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
   ylab(TeX("Ratio between computational times"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
@@ -407,7 +407,7 @@ plot1 = ggplot()+
   geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 plot1
@@ -441,7 +441,7 @@ ggplot()+
             aes(x=b,y=0, col=algo), pch="|")+
   geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
   ylab(TeX("Estimated $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_color_manual("Algorithm", values = c(1,2,3,4))+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
@@ -458,7 +458,7 @@ ggplot()+
             aes(x=b,y=0, col=algo), pch="|")+
   geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
   ylab(TeX("Estimated $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_color_manual("Algorithm", values = c(1,2,3,4))+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
@@ -475,7 +475,7 @@ ggsave("NewFigures/FUNG_LINES_1024_noleg.pdf", width = 15, h=6)
 results <- readRDS("RDS/ALL_rhofixed_2025.RDS")
 truth   <- readRDS("RDS/00_trueLOGProbs_constantSigma.RDS")
 table(results$algo)
-results$algo <- ifelse(results$algo == "RIDGEWAY", "Ridgeway", results$algo)
+results$algo <- ifelse(results$algo == "Ridgway", "Ridgway", results$algo)
 ```
 
 - First, we make sure that all EP algorithm specifications provide very similar results
@@ -637,7 +637,7 @@ d1 <- results_epcB %>%
 d1 <- d1 %>% mutate(algo = case_when(algo == "EP_Chol_algoB"~"EP Chol. Alg. 2", TRUE ~ algo))
 d1$dimf <- factor(d1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
                           "m = 512","m = 1024"))
-d1$algo <- factor(d1$algo,levels =  c("Botev","EP Chol. Alg. 2","TLRank","Ridgeway"))
+d1$algo <- factor(d1$algo,levels =  c("Botev","EP Chol. Alg. 2","TLRank","Ridgway"))
 
 
 d0 = d1
@@ -657,7 +657,7 @@ L[[1]] <-
   geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 
@@ -673,7 +673,7 @@ L[[2]] <-
   geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 
@@ -689,7 +689,7 @@ L[[3]] <-
   geom_point(data=d11 %>% filter((log2prob)==-Inf),aes(x=b,y=0),pch="|",col="darkred")+
   facet_grid(algo~dimf)+
   ylab(TeX("Relative difference in $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
 return(L)
@@ -747,7 +747,7 @@ t1 <- results_epcB %>% mutate(timeep = long_time[1:18400]) %>%
   mutate( dimf = paste("m =",dim))
 
 table(t1$algo)
-t1$algo <- factor(t1$algo,levels =  c("Botev", "TLRank", "Ridgeway"))
+t1$algo <- factor(t1$algo,levels =  c("Botev", "TLRank", "Ridgway"))
 
 
 t1$dimf <- factor(t1$dimf,levels =  c("m = 16","m = 64","m = 128","m = 256",
@@ -760,7 +760,7 @@ L <- ggplot(t1 %>% filter(dim<1024))+
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
   ylab(TeX("Ratio between computational times"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
@@ -775,7 +775,7 @@ L <- ggplot(t1)+
                outlier.shape = NA)+
   facet_grid(algo~dimf)+
   ylab(TeX("Ratio between computational times"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_y_log10()+
   theme(text = element_text(size=15), 
         axis.text.x = element_text(angle = 00, hjust = 1))
@@ -809,7 +809,7 @@ d2$rhof <- factor(d2$rhof)#,levels =  c("$\\rho = 0","m = 64","m = 128","m = 256
 table(d2$algo)
 d2$algo <- factor(d2$algo, levels = c("Botev", 
                                       "EP Chol. Alg. 2",   
-                                      "TLRank" ,     "Ridgeway"))
+                                      "TLRank" ,     "Ridgway"))
 
 broken <- d2 %>% filter(is.na(log2prob2)) %>% group_by(algo, rhof, dimf) %>% 
   reframe(maxb = max(b)) 
@@ -823,7 +823,7 @@ ggplot()+
             aes(x=b,y=0, col=algo), pch="|") +
   geom_vline(data=broken,aes(xintercept = maxb,col=algo,lty=algo))+
   ylab(TeX("Estimated $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_color_manual("Algorithm", values = c(1,2,3,4))+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 
@@ -843,7 +843,7 @@ ggplot(d2)+
   geom_vline(data=broken,aes(xintercept = maxb,
                              col=algo, lty = algo))+
   ylab(TeX("Estimated $log_2$ probabilities"))+
-  xlab(TeX("u"))+
+  xlab(TeX("c"))+
   scale_color_manual("Algorithm", values = c(1,2,3,4))+
   scale_linetype(guide=FALSE)+
   theme(text = element_text(size=15), 

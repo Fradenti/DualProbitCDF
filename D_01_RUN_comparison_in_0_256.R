@@ -1,6 +1,6 @@
 # Dense ----------------------------------------------------------------
 
-Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+Rcpp::sourceCpp("cpp_source/ridgway_cpp.cpp")
 cov_dense <- readRDS("RDS/00_all_covs_dense.RDS")
 cov256 <- cov_dense[[4]]
 n <- nrow(cov256)
@@ -69,7 +69,7 @@ saveRDS(TIMES_RIDGE, "RDS/Comparison_in_0/Dense_RIDGE_times_256.RDS")
 
 # Fungible ----------------------------------------------------------------
 
-Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+Rcpp::sourceCpp("cpp_source/ridgway_cpp.cpp")
 cov_fung <- readRDS("RDS/00_all_covs_fungi.RDS")
 cov256 <- cov_fung[[4]]
 n <- nrow(cov256)
@@ -139,7 +139,7 @@ saveRDS(log2(ep_prob), "RDS/Comparison_in_0/Dense_EPCHOL2_log2P_256.RDS")
 
 # Cov50 ----------------------------------------------------------------
 
-Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+Rcpp::sourceCpp("cpp_source/ridgway_cpp.cpp")
 cov_rhos <- readRDS("RDS/00_all_covs_rhos.RDS")
 cov256   <- cov_rhos[[4]][,,3]
 n <- nrow(cov256)

@@ -26,7 +26,7 @@ for(j in 1:length(RHOs)){
         cat(paste("Run:", k, "out of", NSIM," - ", 
                   (Sys.time()), "with b:", round(Bs[b],3),"\n"))
         PAR <- rbind(PAR,
-                     Orthants_Ridgeway(covM = COV, 
+                     Orthants_Ridgway(covM = COV, 
                                        b_vec = rep(Bs[b],Ns[i]), 
                                        ESS_fraction =  ifelse(Ns[i]>500, .1, .5),
                                        M = 1e4, type = "const"
@@ -53,7 +53,7 @@ for(i in 1:length(Ns)){
       cat(paste("Run:", k, "out of", NSIM," - ", 
                 (Sys.time()), "with b:", round(Bs[b],3),"\n"))
       PAR <- rbind(PAR,
-                   Orthants_Ridgeway(covM = COV, 
+                   Orthants_Ridgway(covM = COV, 
                                      b_vec = rep(Bs[b],Ns[i]), 
                                      ESS_fraction =  ifelse(Ns[i]>500, .1, .5),
                                      M = 1e4, type = "fungible"
@@ -80,7 +80,7 @@ for(i in 1:length(Ns)){
       cat(paste("Run:", k, "out of", NSIM," - ", 
                 (Sys.time()), "with b:", round(Bs[b],3),"\n"))
       PAR <- rbind(PAR,
-                   Orthants_Ridgeway(covM = COV, 
+                   Orthants_Ridgway(covM = COV, 
                                      b_vec = rep(Bs[b],Ns[i]), 
                                      ESS_fraction = ifelse(Ns[i]>500, .1, .5),
                                      M = 1e4, type = "dense")

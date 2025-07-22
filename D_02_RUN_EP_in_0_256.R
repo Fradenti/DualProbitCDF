@@ -1,4 +1,4 @@
-Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+Rcpp::sourceCpp("cpp_source/ridgway_cpp.cpp")
 cov_dense <- readRDS("RDS/00_all_covs_dense.RDS")
 cov256 <- cov_dense[[4]]
 n <- nrow(cov256)
@@ -42,7 +42,7 @@ saveRDS(timeEP, "RDS/Comparison_in_0/fung_EPCHOL2_times_256.RDS")
 
 
 
-Rcpp::sourceCpp("cpp_source/ridgeway_cpp.cpp")
+Rcpp::sourceCpp("cpp_source/ridgway_cpp.cpp")
 cov_rhos <- readRDS("RDS/00_all_covs_rhos.RDS")
 cov256   <- cov_rhos[[4]][,,3]
 n <- nrow(cov256)
